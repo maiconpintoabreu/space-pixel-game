@@ -69,7 +69,7 @@ jobs:
         run: |
           ls ${{ env.PROJECT_BUILD_PATH }}
           cp -r ${{ env.PROJECT_BUILD_PATH }}/${{ env.PROJECT_NAME }} ${{ env.PROJECT_RELEASE_PATH }}
-          cp Readme.md ${{ env.PROJECT_RELEASE_PATH }}
+          cp README.md ${{ env.PROJECT_RELEASE_PATH }}
           cp LICENSE ${{ env.PROJECT_RELEASE_PATH }}
           ls ${{ env.PROJECT_RELEASE_PATH }}
           7z a ./${{ env.PROJECT_RELEASE_PATH }}.zip ./${{ env.PROJECT_RELEASE_PATH }}
