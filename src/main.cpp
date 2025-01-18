@@ -1,5 +1,5 @@
 #include "raylib.h"
-// #include <game_manager.h>
+#include "game_manager.h"
 #include <iostream>
 #include <string>
 #include <cstring>
@@ -52,7 +52,7 @@ const int screenWidth = 640;
 const int screenHeight = 360;
 const float targetFrameTime = 0.02f; // Target 50 FPS
 float accumulator = 0.0f;
-// GameManager *gameManager;
+GameManager *gameManager;
 bool is_game_fullscreen = false;
 
 int main()
@@ -74,7 +74,7 @@ int main()
 
 
     // Create a GameManager instance
-    // gameManager = new GameManager();
+    gameManager = new GameManager();
     SetMouseCursor(MOUSE_CURSOR_CROSSHAIR);
 
 #ifdef __EMSCRIPTEN__
@@ -89,7 +89,7 @@ int main()
     }
 #endif
 
-    // delete gameManager;
+    delete gameManager;
 
     CloseWindow();
 
@@ -114,18 +114,18 @@ void UpdateDrawFrame(void)
     // Measure time elapsed since last frame
     float dt = GetFrameTime();
     // Update game manager
-    // gameManager->Update(dt);
+    gameManager->Update(dt);
     // Fix Update for physics
     accumulator += dt;
     while (accumulator >= targetFrameTime)
     {
-        // gameManager->FixUpdate(targetFrameTime);
+        gameManager->FixUpdate(targetFrameTime);
         accumulator -= targetFrameTime;
     }
 
     BeginDrawing();
     // All drawing happens here
-    // gameManager->Render();
+    gameManager->Render();
 
     EndDrawing();
 

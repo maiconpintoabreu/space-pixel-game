@@ -1,5 +1,5 @@
 # Linux Build and Publish on Itch.io
-# Only run when pushed to master
+# Only run when pushed to main
 
 name: Linux
 on:
@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - master
+      - main
     paths:
       - 'src/**'
       - '.github/workflows/linux.yml'

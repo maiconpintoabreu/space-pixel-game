@@ -1,0 +1,1 @@
+#include "astronomical_object.h"
