@@ -38,17 +38,17 @@ private:
          {{10, 4 + move_by}, {1, 1}, LIGHTGRAY},
          {{5, 5 + move_by}, {5, 1}, LIGHTGRAY}}};
 public:
-    static std::shared_ptr<AstronomicalObject> Create(ObjectType in_object_type, float in_mass, float in_size, int in_rarity, Vector2 in_position, Vector2 in_speed, float in_speed_limit, float temperature){
-        std::shared_ptr<AstronomicalObject> obj = std::make_shared<AstronomicalObject>(in_object_type, in_mass, in_size, in_rarity, in_position, in_speed, in_speed_limit, temperature);
+    static std::shared_ptr<AstronomicalObject> Create(ObjectType in_object_type, float in_mass, float in_size, int in_rarity, Vector2 in_position, Vector2 in_speed, float in_speed_limit, float in_temperature){
+        std::shared_ptr<AstronomicalObject> obj = std::make_shared<AstronomicalObject>(in_object_type, in_mass, in_size, in_rarity, in_position, in_speed, in_speed_limit, in_temperature);
         obj->physics_id = PhysicsObject::CreatePhysicsId(obj);
         TraceLog(LOG_INFO, "Object of type AstronomicalObject created");
         return obj;
     }
-    AstronomicalObject(ObjectType in_object_type, float in_mass, float in_size, int in_rarity, Vector2 in_position, Vector2 in_speed, float in_speed_limit, float temperature){
+    AstronomicalObject(ObjectType in_object_type, float in_mass, float in_size, int in_rarity, Vector2 in_position, Vector2 in_speed, float in_speed_limit, float in_temperature){
         mass = in_mass;
         size = in_size;
         rarity = in_rarity;
-        temperature = temperature;
+        temperature = in_temperature;
         position = in_position;
         speed_limit = in_speed_limit;
         life = 100.0f;

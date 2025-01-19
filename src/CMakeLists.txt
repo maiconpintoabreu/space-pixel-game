@@ -1,7 +1,21 @@
 file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS *.cpp)
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})
 target_include_directories(${PROJECT_NAME} PUBLIC include include/physics)
-target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Werror)
+
+# Detect the compiler
+if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    # GCC
+    target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Werror)
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    # Clang
+    target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Werror)
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+    # Microsoft Visual C++ (MSVC)
+    target_compile_options(${PROJECT_NAME} PRIVATE /W4 /WX) 
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
+  #Intel Compiler
+  target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Werror)
+endif()
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${PROJECT_NAME})
