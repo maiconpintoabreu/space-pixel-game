@@ -9,13 +9,13 @@
 class InputManager
 {
 public:
-    Vector2 touch_start;
+    Vector2 touch_start{};
 
 private:
-    Vector2 touch_current;
+    Vector2 touch_current{};
     bool is_touch_enabled = false;
-    bool is_touching;
-    bool just_touched;
+    bool is_touching = false;
+    bool just_touched = false;
     std::weak_ptr<Player> player;
     float swipeThreshold = 50.0f; // Minimum distance for swipe detection
 
@@ -42,7 +42,7 @@ private:
     bool is_initialized = false;
 
 public:
-    InputManager() : is_touching(false), touch_start({0, 0}), touch_current({0, 0}) {}
+    InputManager() = default;
     ~InputManager()
     {
 

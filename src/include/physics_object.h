@@ -119,7 +119,7 @@ public:
             is_applying_torque = false;
         }
         // check if still colliding
-        for (int i = colliding_objects.size() - 1; i >= 0; i--)
+        for (size_t i = colliding_objects.size() - 1; i >= 0; i--)
         {
             if (auto shared_object = colliding_objects[i].lock())
             {

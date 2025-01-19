@@ -254,12 +254,12 @@ public:
     }
     void Unload()
     {
-        for (int i = 0; i < physic_astronomical_objects.size(); ++i)
+        for (size_t i = 0; i < physic_astronomical_objects.size(); ++i)
         {
             physic_astronomical_objects[i].reset();
         }
         physic_astronomical_objects.clear();
-        for (int i = 0; i < physic_bullet_objects.size(); ++i)
+        for (size_t i = 0; i < physic_bullet_objects.size(); ++i)
         {
             physic_bullet_objects[i].reset();
         }

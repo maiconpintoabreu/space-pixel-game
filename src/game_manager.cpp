@@ -9,13 +9,13 @@ GameManager::GameManager()
     score = 1;
 
     // ... other initializations
-    int frameCounter = 0;
+    // int frameCounter = 0;
     LoadMap();
 
     is_debug = true;
 
     // Initialize menu stars
-    for (int i = 0; i < 100; i++)
+    for (size_t i = 0; i < 100; i++)
     {
         menu_stars.push_back({static_cast<float>(GetRandomValue(0, GetScreenWidth())), static_cast<float>(GetRandomValue(0, GetScreenHeight()))});
     }
@@ -26,6 +26,7 @@ GameManager::GameManager()
     camera.zoom = 1.0f * (GetScreenWidth() + GetScreenHeight()) / 1000;
     input_manager = new InputManager();
     SpawnAsteroid(asteriod_cooldown_time);
+    planet = Planet::Create({GetScreenWidth()/2.0f, GetScreenHeight()/2.0f});
 }
 
 void GameManager::Update(float delta_time)
@@ -63,7 +64,7 @@ void GameManager::Update(float delta_time)
         score = player->GetScore();
     }
     star_builder->Update(delta_time);
-    Vector2 camera_with_offset = Vector2Subtract(camera.target, camera.offset);
+    // Vector2 camera_with_offset = Vector2Subtract(camera.target, camera.offset);
 }
 
 void GameManager::FixUpdate(float delta_time)
@@ -88,6 +89,7 @@ void GameManager::Render()
     {
         BeginMode2D(camera);
             star_builder->Render();
+            planet->Render();
             player->Render();
             PhysicsSystem::GetInstance().Render();
         EndMode2D();
@@ -104,6 +106,7 @@ void GameManager::Render()
             {
                 DrawPixel(star.x, star.y, WHITE);
             }
+            planet->Render();
         EndMode2D();
         float size_width = 200.0f;
         float size_height = 50.0f;
@@ -133,6 +136,10 @@ void GameManager::Render()
     // Draw input manager debug
     if (is_debug)
     {
+        // Draw Player position
+        if (player) DrawText(TextFormat("Player: %f, %f", player->GetPosition().x, player->GetPosition().y), 10, 100, 5, WHITE);
+        // Draw Planet position
+        if (planet) DrawText(TextFormat("Planet: %f, %f", planet->GetPosition().x, planet->GetPosition().y), 10, 110, 5, WHITE);
         // Draw screen size
         DrawText(TextFormat("Screen: %i, %i", GetScreenWidth(), GetScreenHeight()), 10, 130, 5, WHITE);
 

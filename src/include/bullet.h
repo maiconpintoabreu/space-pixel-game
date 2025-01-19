@@ -114,8 +114,8 @@ public:
 
         // Update bullet rotation (optional)
         // bulletRotation = atan2f(direction.y, bulletDirection.x) * RAD2DEG;
-        float bullet_color[4] = { 1.0f, 0.0f, 0.0f, 1.0f }; 
-        float bullet_position[2] = {position.x, position.y};
+        // float bullet_color[4] = { 1.0f, 0.0f, 0.0f, 1.0f }; 
+        // float bullet_position[2] = {position.x, position.y};
     }
 
     void SetEnabled(bool enabled)

@@ -60,11 +60,11 @@ Player::Player()
     center = origin;
     is_on_screen = true;
     gun_cooldown_time = 0.1f;
-    float thruster_offset_x = spaceship.width * 0.2f;
-    float thruster_offset_y = spaceship.height * 0.4f;
+    // float thruster_offset_x = spaceship.width * 0.2f;
+    // float thruster_offset_y = spaceship.height * 0.4f;
 
-    Vector2 left_thruster_pos = { position.x - thruster_offset_x, position.y + thruster_offset_y };
-    Vector2 right_thruster_pos = { position.x + thruster_offset_x, position.y + thruster_offset_y };
+    // Vector2 left_thruster_pos = { position.x - thruster_offset_x, position.y + thruster_offset_y };
+    // Vector2 right_thruster_pos = { position.x + thruster_offset_x, position.y + thruster_offset_y };
 }
 // Spaceship physics logic
 void Player::FixUpdate(float delta_time)
@@ -89,7 +89,7 @@ void Player::Update(float delta_time)
         sinf(rotation * DEG2RAD),
         -cosf(rotation * DEG2RAD)};
     gun_position = Vector2Add(position, {direction.x * (spaceship.width - 10.0f), direction.y * (spaceship.height - 10.0f)});
-    for (int i = bullets.size()-1; i >= 0; i--)
+    for (size_t i = bullets.size()-1; i >= 0; i--)
     {
         if (auto shared_bullet = bullets.at(i).lock())
         {
@@ -105,6 +105,8 @@ void Player::Update(float delta_time)
                         shared_bullet->Destroy();
                         score += 10;
                         break;
+                        default:
+                        break;
                     }
                 }
             }
@@ -117,31 +119,31 @@ void Player::Update(float delta_time)
             bullets.erase(bullets.begin() + i);
         }
     }
-    // Update Thruster Position
-    float thruster_offset_x = spaceship.width * 0.2f;
-    float thruster_offset_y = spaceship.height * 0.4f;
+    // // Update Thruster Position
+    // float thruster_offset_x = spaceship.width * 0.2f;
+    // float thruster_offset_y = spaceship.height * 0.4f;
 
     // Left thruster
-    Vector2 left_thruster_offset = {
-        thruster_offset_x * direction.x - thruster_offset_y * direction.y,
-        thruster_offset_x * direction.y + thruster_offset_y * direction.x
-    };
+    // Vector2 left_thruster_offset = {
+    //     thruster_offset_x * direction.x - thruster_offset_y * direction.y,
+    //     thruster_offset_x * direction.y + thruster_offset_y * direction.x
+    // };
     
-    Vector2 left_thruster_pos = {
-        position.x + left_thruster_offset.x,
-        position.y + left_thruster_offset.y
-    };
+    // Vector2 left_thruster_pos = {
+    //     position.x + left_thruster_offset.x,
+    //     position.y + left_thruster_offset.y
+    // };
 
     // Right thruster
-    Vector2 right_thruster_offset = {
-        thruster_offset_x * direction.x - thruster_offset_y * direction.y,
-        thruster_offset_x * direction.y + thruster_offset_y * direction.x
-    };
+    // Vector2 right_thruster_offset = {
+    //     thruster_offset_x * direction.x - thruster_offset_y * direction.y,
+    //     thruster_offset_x * direction.y + thruster_offset_y * direction.x
+    // };
     
-    Vector2 right_thruster_pos = {
-        position.x + right_thruster_offset.x,
-        position.y + right_thruster_offset.y
-    };
+    // Vector2 right_thruster_pos = {
+    //     position.x + right_thruster_offset.x,
+    //     position.y + right_thruster_offset.y
+    // };
 
     // thruster_left.SetEmitterPosition(left_thruster_pos);
     // thruster_right.SetEmitterPosition(right_thruster_pos);

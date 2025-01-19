@@ -12,6 +12,7 @@
 #include "input_manager.h"
 #include "star_builder.h"
 #include "astronomical_object.h"
+#include "planet.h"
 
 #include "physics_system.h"
 #include "physics_object.h"
@@ -27,6 +28,8 @@ private:
     StarBuilder *star_builder = nullptr;
     InputManager *input_manager = nullptr;
     std::shared_ptr<AstronomicalObject> asteroid;
+    std::shared_ptr<Planet> planet;
+
     float asteriod_cooldown = 0.0f;
     float asteriod_cooldown_time = 1.0f;
     bool is_menu = true;
