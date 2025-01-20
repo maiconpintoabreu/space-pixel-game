@@ -37,9 +37,6 @@ private:
         }
     }
 public:
-    Vector2 camera_position = {0.0f, 0.0f};
-
-public:
     inline int CreatePhysicsObject(std::shared_ptr<PhysicsObject> shared_physic_object)
     {
         int index = ++current_object_id;
@@ -83,17 +80,17 @@ public:
     PhysicsSystem(const PhysicsSystem &) = delete;
     PhysicsSystem &operator=(const PhysicsSystem &) = delete;
 
-    inline void Update(float deltaTime)
+    inline void Update(float delta_time)
     {
     }
 
-    inline void FixUpdate(float deltaTime, Vector2 camera_with_offset)
+    inline void FixUpdate(float delta_time, Vector2 camera_with_offset)
     {
         if (player)
         {
-            player->velocity.y += m_gravity_y * deltaTime;
-            player->velocity.x += m_gravity_x * deltaTime;
-            player->FixUpdate(deltaTime);
+            player->velocity.y += m_gravity_y * delta_time;
+            player->velocity.x += m_gravity_x * delta_time;
+            player->FixUpdate(delta_time);
             player->is_on_screen = IsPositionOnScreen(player->position, camera_with_offset);
             if (player->is_on_screen)
             {
@@ -108,9 +105,9 @@ public:
         {
             if (obj)
             {
-                obj->velocity.y += m_gravity_y * deltaTime;
-                obj->velocity.x += m_gravity_x * deltaTime;
-                obj->FixUpdate(deltaTime);
+                obj->velocity.y += m_gravity_y * delta_time;
+                obj->velocity.x += m_gravity_x * delta_time;
+                obj->FixUpdate(delta_time);
                 obj->is_on_screen = IsPositionOnScreen(obj->position, camera_with_offset);
                 if (obj->is_on_screen)
                 {
@@ -127,9 +124,9 @@ public:
         {
             if (obj)
             {
-                obj->velocity.y += m_gravity_y * deltaTime;
-                obj->velocity.x += m_gravity_x * deltaTime;
-                obj->FixUpdate(deltaTime);
+                obj->velocity.y += m_gravity_y * delta_time;
+                obj->velocity.x += m_gravity_x * delta_time;
+                obj->FixUpdate(delta_time);
                 obj->is_on_screen = IsPositionOnScreen(obj->position, camera_with_offset);
                 if (obj->is_on_screen)
                 {

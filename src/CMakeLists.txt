@@ -10,8 +10,8 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     # Clang
     target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Werror)
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-    # Microsoft Visual C++ (MSVC)
-    target_compile_options(${PROJECT_NAME} PRIVATE /W4 /WX) 
+    # Do not use /W4 for now, as it is too strict and generates too many warnings
+    # target_compile_options(${PROJECT_NAME} PRIVATE /W4 /WX) 
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
   #Intel Compiler
   target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Werror)
