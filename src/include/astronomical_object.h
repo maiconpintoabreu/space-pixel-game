@@ -58,7 +58,7 @@ public:
 
         Image asteroid_image = GenImageColor(16, 16, BLANK);
 
-        for (size_t i = 0; i < asteroid_shape_01.points.size(); i++)
+        for (size_t  i = 0; i < asteroid_shape_01.points.size(); i++)
         {
             ImageDrawRectangleV(&asteroid_image, asteroid_shape_01.points[i].position, asteroid_shape_01.points[i].direction, asteroid_shape_01.points[i].color);
         }

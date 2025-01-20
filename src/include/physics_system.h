@@ -251,12 +251,12 @@ public:
     }
     void Unload()
     {
-        for (size_t i = 0; i < physic_astronomical_objects.size(); ++i)
+        for (size_t  i = 0; i < physic_astronomical_objects.size(); ++i)
         {
             physic_astronomical_objects[i].reset();
         }
         physic_astronomical_objects.clear();
-        for (size_t i = 0; i < physic_bullet_objects.size(); ++i)
+        for (size_t  i = 0; i < physic_bullet_objects.size(); ++i)
         {
             physic_bullet_objects[i].reset();
         }
@@ -271,9 +271,9 @@ private:
         : m_gravity_x(gravity_x), m_gravity_y(gravity_y) {}
 
     // inline void CheckCollisions() {
-    //     for (size_t i = 0; i < physic_objects.size(); ++i) {
+    //     for (int i = 0; i < physic_objects.size(); ++i) {
     //         if(physic_objects[i]->is_collision_enabled){
-    //             for (size_t j = i + 1; j < physic_objects.size(); ++j) {
+    //             for (int j = i + 1; j < physic_objects.size(); ++j) {
     //                 if (physic_objects[i] && physic_objects[j] && physic_objects[j]->is_collision_enabled) {
     //                     physic_objects[i]->CheckCollision(physic_objects[j]);
     //                 }

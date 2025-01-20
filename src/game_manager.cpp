@@ -15,7 +15,7 @@ GameManager::GameManager()
     is_debug = true;
 
     // Initialize menu stars
-    for (size_t i = 0; i < 100; i++)
+    for (int i = 0; i < 100; i++)
     {
         menu_stars.push_back({static_cast<float>(GetRandomValue(0, GetScreenWidth())), static_cast<float>(GetRandomValue(0, GetScreenHeight()))});
     }

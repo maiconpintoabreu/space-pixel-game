@@ -89,7 +89,7 @@ void Player::Update(float delta_time)
         sinf(rotation * DEG2RAD),
         -cosf(rotation * DEG2RAD)};
     gun_position = Vector2Add(position, {direction.x * (spaceship.width - 10.0f), direction.y * (spaceship.height - 10.0f)});
-    for (size_t i = bullets.size()-1; i >= 0; i--)
+    for (int i = bullets.size()-1; i >= 0; i--)
     {
         if (auto shared_bullet = bullets.at(i).lock())
         {

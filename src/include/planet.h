@@ -45,9 +45,9 @@ public:
             {BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK}
         };
         Image planet1_image = GenImageColor(16, 16, BLANK);
-        for (size_t y = 0; y < 16; y++)
+        for (int y = 0; y < 16; y++)
         {
-            for (size_t x = 0; x < 16; x++)
+            for (int x = 0; x < 16; x++)
             {
                 ImageDrawPixel(&planet1_image, x, y, planet1[y][x]);
             }

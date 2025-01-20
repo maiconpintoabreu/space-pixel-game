@@ -119,7 +119,7 @@ public:
             is_applying_torque = false;
         }
         // check if still colliding
-        for (size_t i = colliding_objects.size() - 1; i >= 0; i--)
+        for (int i = colliding_objects.size() - 1; i >= 0; i--)
         {
             if (auto shared_object = colliding_objects[i].lock())
             {
@@ -194,7 +194,7 @@ public:
     inline virtual void ExitCollision(std::shared_ptr<PhysicsObject> other)
     {
         // remove from colliding objects
-        for (size_t i = 0; i < colliding_objects.size(); ++i)
+        for (size_t  i = 0; i < colliding_objects.size(); ++i)
         {
             if (colliding_objects[i].lock() == other)
             {
@@ -306,7 +306,7 @@ private:
         auto getNormals = [](const std::vector<Vector2> &poly)
         {
             std::vector<Vector2> normals;
-            for (size_t i = 0; i < poly.size(); ++i)
+            for (size_t  i = 0; i < poly.size(); ++i)
             {
                 Vector2 edge = poly[(i + 1) % poly.size()] - poly[i];
                 normals.push_back({-edge.y, edge.x}); // 90-degree rotation for normal
