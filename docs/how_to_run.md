@@ -3,8 +3,6 @@
 ## Project Structure
 
 - `src/`: Contains the source code for the game.
-    - `game/`: Contains the game logic and game manager.
-    - `main/`: Contains the main entry point for the game.
 - `.vscode/`: Contains Visual Studio Code settings and tasks.
 - `.github/workflows/`: Contains GitHub Actions workflows for CI/CD.
 
