@@ -26,13 +26,3 @@ make build
 ```sh
 make run
 ```
-
-## Contributing
-
-Contributions are welcome! Please open an issue or submit a pull request.
-
-## License
-
-This project is licensed under the MIT License.
-
-Link to the license file: [LICENSE](LICENSE)
