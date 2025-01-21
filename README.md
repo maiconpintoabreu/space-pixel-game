@@ -13,11 +13,7 @@ Iara's Lament: Voidfarers
 ![Build WebAssembly Status](https://github.com/maiconpintoabreu/space-pixel-game/actions/workflows/web.yml/badge.svg)
 ## Overview
 
-Inventory Game is a simple game developed using C++ and the Raylib library. The game features a star field simulation and basic game mechanics such as updating and rendering game objects.
-
-Link to the game design document: [Game Design Document](docs/Game.md)
-
-Link to the task list: [Task List](docs/Todo.md)
+Space Pixel Game is a simple game developed using C++ and Raylib.
 
 ## Features
 
@@ -31,7 +27,6 @@ Link to the task list: [Task List](docs/Todo.md)
 - `src/`: Contains the source code for the game.
     - `game/`: Contains the game logic and game manager.
     - `main/`: Contains the main entry point for the game.
-- `tests/`: Contains unit tests for the game.
 - `.vscode/`: Contains Visual Studio Code settings and tasks.
 - `.github/workflows/`: Contains GitHub Actions workflows for CI/CD.
 
@@ -54,12 +49,6 @@ make build
 
 ```sh
 make run
-```
-
-### Test
-
-```sh
-make test
 ```
 
 ## Contributing

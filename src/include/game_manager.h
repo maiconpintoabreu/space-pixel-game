@@ -23,7 +23,7 @@ private:
     bool is_debug = false;
     int frameCounter = 0;
     std::string map_name = "01";
-    Camera2D camera = {0};
+    Camera2D camera;
     std::shared_ptr<Player> player;
     StarBuilder *star_builder = nullptr;
     InputManager *input_manager = nullptr;

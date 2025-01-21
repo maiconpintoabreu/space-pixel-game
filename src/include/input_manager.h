@@ -12,12 +12,8 @@ public:
     Vector2 touch_start{};
 
 private:
-    Vector2 touch_current{};
     bool is_touch_enabled = false;
-    bool is_touching = false;
-    bool just_touched = false;
     std::weak_ptr<Player> player;
-    float swipeThreshold = 50.0f; // Minimum distance for swipe detection
 
     bool is_turning_left = false;
     bool is_turning_right = false;
@@ -28,10 +24,6 @@ private:
     Rectangle touch_up_area = Rectangle();
     Rectangle touch_shoot_area = Rectangle();
     Image turn_image;
-
-    Image turn_left_image;
-    Image turn_right_image;
-    Image accelerate_image;
     Image shoot_image;
 
     Texture2D turn_left_texture;

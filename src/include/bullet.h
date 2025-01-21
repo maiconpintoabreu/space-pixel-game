@@ -32,7 +32,7 @@ public:
     Texture2D bullet_texture;
     bool is_enabled = false;
     bool is_shooting = false;
-    float life_time = 1.0f;
+    float life_time = 10.0f;
     float damage = 100.0f;
     std::weak_ptr<PhysicsObject> owner;
     std::queue<BulletEvent> eventQueue;
