@@ -203,7 +203,7 @@ public:
             colliding_objects.erase(colliding_objects.begin() + i);
             break;
         }
-        ExitCollision(other);
+        // ExitCollision(other);
         if (colliding_objects.size() == 0)
             is_colliding = false;
     }
