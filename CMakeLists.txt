@@ -10,8 +10,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 option(TESTING "Avoid to breaking trying to use opengl" OFF)
 
-set(CMAKE_BUILD_TYPE Debug)
-
 # Dependencies
 # set(RAYLIB_VERSION 5.5) # Change this to the version you want to use
 set(RAYLIB_VERSION "master")
