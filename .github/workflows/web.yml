@@ -51,27 +51,21 @@ jobs:
           mkdir -p ${{ env.PROJECT_RELEASE_PATH }}/${{ env.PROJECT_RESOURCES_PATH }}
           ls
         shell: bash
-      
-      - name: Install Emscripten
-        run: |
-          mkdir -p ${{ env.PROJECT_BUILD_PATH }}
-          git clone https://github.com/emscripten-core/emsdk.git
-          cd emsdk
-          chmod +x ./emsdk
-          ./emsdk install latest
-          ./emsdk activate latest
-          source ./emsdk_env.sh
-          emcc -v
-          cd ..
+  
+    - name: Setup emsdk
+      uses: mymindstorm/setup-emsdk@v14
+      with:
+        version: 3.1.71
+        actions-cache-folder: 'emsdk-cache'
 
       # Build emscripten project using a raylibshell html file
       - name: Configure Project
         run: |
-          cd ${{ env.PROJECT_BUILD_PATH }} && ../emsdk/upstream/emscripten/emcmake cmake .. -DPLATFORM=Web -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXECUTABLE_SUFFIX=".html" -DPROJECT_RESOURCES_PATH=${{ env.PROJECT_RESOURCES_PATH }}
+          cd ${{ env.PROJECT_BUILD_PATH }} && emcmake cmake .. -DPLATFORM=Web -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXECUTABLE_SUFFIX=".html" -DPROJECT_RESOURCES_PATH=${{ env.PROJECT_RESOURCES_PATH }}
           
       - name: Build Project
         run: |
-          cd ${{ env.PROJECT_BUILD_PATH }} && ../emsdk/upstream/emscripten/emmake make BUILD_MODE=RELEASE PROJECT_CUSTOM_FLAGS=${{ env.PROJECT_CUSTOM_FLAGS }}
+          cd ${{ env.PROJECT_BUILD_PATH }} && emmake make BUILD_MODE=RELEASE PROJECT_CUSTOM_FLAGS=${{ env.PROJECT_CUSTOM_FLAGS }}
           cp ${{ env.PROJECT_NAME }}/${{env.PROJECT_NAME}}.html ${{ env.PROJECT_NAME }}/index.html
       
       - name: Generate Artifacts
