@@ -33,7 +33,7 @@ Space Pixel Game is a simple game developed using C++ and Raylib.
 
 ## Getting Started
 
-### Installation & Running the Game 
+### Local compilation & Running the Game 
 [How to Run](docs/how_to_run.md)
 
 ## How to Play
