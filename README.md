@@ -58,7 +58,7 @@ Space Pixel Game is a simple game developed using C++ and Raylib.
         * Space Key: Shoot a beam forward
     * Mobile:
         * Screen control +: Shoot a beam forward
-*   **Objective:** [Explain the main goal of the game, if any]
+*   **Objective:** Your primary goal is to explore the procedurally generated galaxy, gather resources to upgrade your ship, and survive challenging encounters with enemy ships. You must reach the galactic core, where a powerful ancient artifact awaits, said to hold the key to stopping the Void Blight that threatens to consume the galaxy.
 
 ## Reporting Issues
 
