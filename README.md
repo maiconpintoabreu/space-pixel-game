@@ -11,9 +11,9 @@
 **Space Pixel Game** is an open-source, space-themed exploration and combat game featuring charming pixel art graphics and engaging arcade-style gameplay. Explore vast procedurally generated star systems, battle diverse enemies, gather resources, craft upgrades, and uncover the secrets of the galaxy!
 
 # Name Options
-The Dying Echoes of Iara
-Iara's Starfall Nomads
-Iara's Lament: Voidfarers
+* **The Dying Echoes of Iara**
+* **Iara's Starfall Nomads**
+* **Iara's Lament: Voidfarers**
 
 ## Frameworks and Language
 

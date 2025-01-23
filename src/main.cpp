@@ -114,18 +114,22 @@ void UpdateDrawFrame(void)
     // Measure time elapsed since last frame
     float dt = GetFrameTime();
     // Update game manager
-    gameManager->Update(dt);
-    // Fix Update for physics
-    accumulator += dt;
-    while (accumulator >= targetFrameTime)
-    {
-        gameManager->FixUpdate(targetFrameTime);
-        accumulator -= targetFrameTime;
+    if(IsWindowFocused()){
+        TraceLog(LOG_INFO, "Windows Focused!!!");
+        gameManager->Update(dt);
+        // Fix Update for physics
+        accumulator += dt;
+        while (accumulator >= targetFrameTime)
+        {
+            gameManager->FixUpdate(targetFrameTime);
+            accumulator -= targetFrameTime;
+        }
     }
-
     BeginDrawing();
     // All drawing happens here
-    gameManager->Render();
+    if(IsWindowFocused()){
+        gameManager->Render();
+    }
 
     EndDrawing();
 
