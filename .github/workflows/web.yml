@@ -52,11 +52,11 @@ jobs:
           ls
         shell: bash
   
-    - name: Setup emsdk
-      uses: mymindstorm/setup-emsdk@v14
-      with:
-        version: 3.1.71
-        actions-cache-folder: 'emsdk-cache'
+      - name: Setup emsdk
+        uses: mymindstorm/setup-emsdk@v14
+        with:
+          version: 3.1.71
+          actions-cache-folder: 'emsdk-cache'
 
       # Build emscripten project using a raylibshell html file
       - name: Configure Project
