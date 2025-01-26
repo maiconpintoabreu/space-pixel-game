@@ -9,7 +9,7 @@ on:
     branches:
       - main
     paths:
-      - 'src/**'
+      # - 'src/**' Disable rebuild on src changes
       - '.github/workflows/linux.yml'
     
 permissions:

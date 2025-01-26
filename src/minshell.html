@@ -60,29 +60,26 @@
     src="https://cdn.jsdelivr.net/gh/eligrey/FileSaver.js/dist/FileSaver.min.js">
     </script>
   <script type='text/javascript'>
-      function saveFileFromMEMFSToDisk(memoryFSname, localFSname) // This can be called by C/C++ code
-      {
-        var isSafari = false; // Not supported, navigator.userAgent access is being restricted
-        //var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-        var data = FS.readFile(memoryFSname);
-        var blob;
+    function saveFileFromMEMFSToDisk(memoryFSname, localFSname) // This can be called by C/C++ code
+    {
+      var isSafari = false; // Not supported, navigator.userAgent access is being restricted
+      //var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+      var data = FS.readFile(memoryFSname);
+      var blob;
 
-        if (isSafari) blob = new Blob([data.buffer], { type: "application/octet-stream" });
-        else blob = new Blob([data.buffer], { type: "application/octet-binary" });
+      if (isSafari) blob = new Blob([data.buffer], { type: "application/octet-stream" });
+      else blob = new Blob([data.buffer], { type: "application/octet-binary" });
 
-        // NOTE: SaveAsDialog is a browser setting. For example, in Google Chrome,
-        // in Settings/Advanced/Downloads section you have a setting:
-        // 'Ask where to save each file before downloading' - which you can set true/false.
-        // If you enable this setting it would always ask you and bring the SaveAsDialog
-        saveAs(blob, localFSname);
-      }
-    </script>
+      // NOTE: SaveAsDialog is a browser setting. For example, in Google Chrome,
+      // in Settings/Advanced/Downloads section you have a setting:
+      // 'Ask where to save each file before downloading' - which you can set true/false.
+      // If you enable this setting it would always ask you and bring the SaveAsDialog
+      saveAs(blob, localFSname);
+    }
+  </script>
 </head>
 
 <body>
-  <span style="position: fixed; top: 10px; right: 10px;">
-    <input type="button" value="🖵" onclick="Module.requestFullscreen(false, true)">
-  </span>
   <div style="height: 100vh; display: flex; align-items: center;">
     <canvas class=emscripten id=canvas oncontextmenu=event.preventDefault() tabindex=-1></canvas>
   </div>
