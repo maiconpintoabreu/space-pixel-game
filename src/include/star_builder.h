@@ -136,21 +136,6 @@ private:
             star.color = {255, 255, 255, static_cast<unsigned char>(GetRandomValue(155, 255))};
         }
     }
-
-    inline bool IsPositionOnScreen(Vector2 world_position, Vector2 camera_position)
-    {
-        float screen_width_with_zoom = screen_width * camera_zoom;
-        float screen_height_with_zoom = screen_height * camera_zoom;
-        if (world_position.x >= camera_position.x && world_position.x <= camera_position.x + screen_width_with_zoom &&
-            world_position.y >= camera_position.y && world_position.y <= camera_position.y + screen_height_with_zoom)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
 };
 
 #endif // STARBUILDER_H

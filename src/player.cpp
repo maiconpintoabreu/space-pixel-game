@@ -102,11 +102,11 @@ void Player::Update(float delta_time)
 
                     switch (event.type) {
                         case BulletEventType::COLLISION:
-                        shared_bullet->Destroy();
-                        score += 10;
-                        break;
+                            shared_bullet->Destroy();
+                            score += 10;
+                            break;
                         default:
-                        break;
+                            break;
                     }
                 }
             }

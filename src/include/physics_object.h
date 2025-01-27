@@ -176,23 +176,12 @@ public:
         if (!other)
             return;
         is_colliding = true;
-        for (auto &object : colliding_objects)
-        {
-            if (auto shared_object = object.lock())
-            {
-                if (shared_object->id == other->id)
-                {
-                    return;
-                }
-            }
-        }
-        // add to colliding objects
-        colliding_objects.push_back(other);
-        EnterCollision(shared_from_this());
+        if (AddCollidingObject(other)) EnterCollision(shared_from_this());
     }
 
     inline virtual void ExitCollision(std::shared_ptr<PhysicsObject> other)
     {
+        int index_to_remove = -1;
         // remove from colliding objects
         for (size_t  i = 0; i < colliding_objects.size(); ++i)
         {
@@ -200,9 +189,10 @@ public:
             {
                 colliding_objects[i].reset();
             }
-            colliding_objects.erase(colliding_objects.begin() + i);
+            index_to_remove = i;
             break;
         }
+        RemoveCollidingObject(index_to_remove);
         // ExitCollision(other);
         if (colliding_objects.size() == 0)
             is_colliding = false;
@@ -229,6 +219,35 @@ public:
     {
         shape = s;
     }
+
+    inline bool AddCollidingObject(std::shared_ptr<PhysicsObject> other){
+        
+        for (auto &object : colliding_objects)
+        {
+            if (auto shared_object = object.lock())
+            {
+                if (shared_object->id == other->id)
+                {
+                    return false;
+                }
+            }
+        }
+        
+        // add to colliding objects
+        colliding_objects.push_back(other);
+        return true;
+    }
+
+    inline void RemoveCollidingObject(int index){
+        if(index < 0) return;
+        int last_index = static_cast<int>(colliding_objects.size())-1;
+        if(index > last_index) return;
+        if(index != 0){
+            colliding_objects[index] = colliding_objects[last_index];
+        }
+        colliding_objects.pop_back();
+    }
+
     // debug render shape of object and if is colliding
     inline virtual void Render()
     {

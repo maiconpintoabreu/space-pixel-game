@@ -99,7 +99,6 @@ void GameManager::Render()
     DrawText(TextFormat("Score: %d", score), 10, 70, 5, GREEN);
     if (is_menu)
     {
-
         BeginMode2D(camera);
             // Draw random static stars
             for (Vector2 star : menu_stars)
@@ -117,6 +116,7 @@ void GameManager::Render()
 
             // Initialize player
             player = Player::Create();
+            player->position = Vector2({GetScreenWidth()/camera.zoom/2, GetScreenHeight()/camera.zoom/2});
             input_manager->SetPlayer(player);
             camera.target = player->GetPosition();
             camera.offset = Vector2({GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f});

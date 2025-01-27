@@ -41,7 +41,7 @@ public:
     static std::shared_ptr<Bullet> Create(){
         std::shared_ptr<Bullet> obj = std::make_shared<Bullet>();
         obj->physics_id = PhysicsObject::CreatePhysicsId(obj);
-        TraceLog(LOG_INFO, "Object of type Bullet created");
+        // TraceLog(LOG_INFO, "Object of type Bullet created");
         return obj;
     }
     Bullet()

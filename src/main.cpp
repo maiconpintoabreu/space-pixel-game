@@ -97,7 +97,6 @@ int main()
 }
 void UpdateDrawFrame(void)
 {
-    
     if (!is_game_fullscreen && IsWindowFullscreen())
     {
 #ifdef __EMSCRIPTEN__
@@ -115,7 +114,6 @@ void UpdateDrawFrame(void)
     float dt = GetFrameTime();
     // Update game manager
     if(IsWindowFocused()){
-        TraceLog(LOG_INFO, "Windows Focused!!!");
         gameManager->Update(dt);
         // Fix Update for physics
         accumulator += dt;

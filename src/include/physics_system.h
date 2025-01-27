@@ -171,6 +171,8 @@ public:
         auto it = by_id_physic_objects.find(object_id);
         if (it == by_id_physic_objects.end())
             return;
+        int index_to_remove = -1;
+        int last_index = -1;
         if (auto shared_physic_object = it->second.lock())
         {
             switch (shared_physic_object->object_type)
@@ -179,10 +181,48 @@ public:
                 player.reset();
                 break;
             case ObjectType::ASTEROID_TYPE:
-                physic_astronomical_objects.erase(std::remove(physic_astronomical_objects.begin(), physic_astronomical_objects.end(), shared_physic_object), physic_astronomical_objects.end());
+                // remove from colliding objects
+                for (size_t  i = 0; i < physic_astronomical_objects.size(); ++i)
+                {
+                    if(auto shared_physics_object = physic_astronomical_objects[i]){
+                        if (shared_physics_object->id == object_id)
+                        {
+                            index_to_remove = i;
+                            break;
+                        }
+                    }
+                }
+                if(index_to_remove < 0) return;
+                last_index = static_cast<int>(physic_astronomical_objects.size())-1;
+                if(index_to_remove > last_index) return;
+                physic_astronomical_objects[index_to_remove].reset();
+                if(index_to_remove != 0){
+                    physic_astronomical_objects[index_to_remove] = physic_astronomical_objects[last_index];
+                }
+                physic_astronomical_objects.pop_back();
                 break;
             case ObjectType::BULLET_TYPE:
-                physic_bullet_objects.erase(std::remove(physic_bullet_objects.begin(), physic_bullet_objects.end(), shared_physic_object), physic_bullet_objects.end());
+                // remove from colliding objects
+                for (size_t  i = 0; i < physic_bullet_objects.size(); ++i)
+                {
+                    if(auto shared_physics_object = physic_bullet_objects[i]){
+                        if (shared_physics_object->id == object_id)
+                        {
+                            index_to_remove = i;
+                            break;
+                        }
+                    }
+                }
+                TraceLog(LOG_DEBUG, TextFormat("index removed: %i", index_to_remove));
+                if(index_to_remove < 0) return;
+                last_index = static_cast<int>(physic_bullet_objects.size())-1;
+                if(index_to_remove > last_index) return;
+                physic_bullet_objects[index_to_remove].reset();
+                if(index_to_remove != 0){
+                    physic_bullet_objects[index_to_remove] = physic_bullet_objects[last_index];
+                }
+                physic_bullet_objects.pop_back();
+                TraceLog(LOG_DEBUG, TextFormat("index removed: %i", index_to_remove));
                 break;
             default:
                 TraceLog(LOG_WARNING, "Unknown object type");
