@@ -1,17 +1,17 @@
 # Define the build directory
 BUILD_DIR = build
-
+BUILD_TYPE ?= Debug  # Default to 'Debug' if BUILD_TYPE is not defined
 # Default target Linux
 all: configure build test
 
 # Check if the build directory exists, if not create it
 configure-windows:
 	@mkdir $(BUILD_DIR)> NUL
-	@cmake build . -S . -B $(BUILD_DIR) -DCMAKE_BUILD_TYPE=Release
+	@cmake build . -S . -B $(BUILD_DIR) -DCMAKE_BUILD_TYPE=${BUILD_TYPE}
 
 configure:
 	@mkdir -p $(BUILD_DIR)
-	@cmake build . -S . -B $(BUILD_DIR) -DCMAKE_BUILD_TYPE=Release
+	@cmake build . -S . -B $(BUILD_DIR) -DCMAKE_BUILD_TYPE=${BUILD_TYPE}
 
 configure-web:
 	@mkdir -p $(BUILD_DIR)
@@ -25,8 +25,8 @@ build-web:
 	@cd $(BUILD_DIR) && emmake make 
 
 # Run tests
-# test:
-# 	@ctest --test-dir $(BUILD_DIR) -DTESTING_ENABLED=1 -DTESTING=1
+test:
+	@ctest --test-dir $(BUILD_DIR) -DTESTING_ENABLED=1 -DTESTING=1
 
 clean-all:
 	rm -rf $(BUILD_DIR)
@@ -40,6 +40,7 @@ clean:
 	rm -rf $(BUILD_DIR)/src
 	rm -rf $(BUILD_DIR)/Testing
 	rm -rf $(BUILD_DIR)/tests
+	rm -rf $(BUILD_DIR)/lib
 run:
 	./$(BUILD_DIR)/space-pixel-game/space-pixel-game
 .PHONY: all configure build test clean

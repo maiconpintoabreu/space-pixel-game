@@ -9,10 +9,7 @@ class DynamicBody : public PhysicsObject
 {
 public:
     // Constructor
-    DynamicBody()
-    {
-
-    }
+    DynamicBody() = default;
 
     // Apply force to move forward
     virtual void ApplyForce(float force);

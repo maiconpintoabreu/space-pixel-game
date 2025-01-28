@@ -1,22 +1,21 @@
 # Linux Build and Test
-# Only run when pushed not master
+# Only run when pushed not main
 
 name: Test
 on:
   
   workflow_dispatch:
   push:
-    branches-ignore:
-      - master
     paths:
       - 'src/**'
+      - 'tests/**'
       - '.github/workflows/ci.yml'
     
 permissions:
   contents: read
 
 jobs:
-  build-project:
+  build-test:
     permissions:
       contents: write       # for actions/upload-release-asset to upload release asset
     runs-on: ubuntu-20.04

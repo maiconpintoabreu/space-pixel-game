@@ -1,6 +1,6 @@
 file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS *.cpp)
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})
-target_include_directories(${PROJECT_NAME} PUBLIC include include/physics)
+target_include_directories(${PROJECT_NAME} PUBLIC include)
 
 # Detect the compiler
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
