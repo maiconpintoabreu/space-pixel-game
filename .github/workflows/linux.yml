@@ -16,6 +16,17 @@ permissions:
   contents: read
 
 jobs:
+  wait-for-test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Wait for Test workflow to complete
+      uses: fountainhead/action-wait-for-workflow@v1.3.0
+      id: wait-for-workflow
+      with:
+        workflow: ci.yml
+        ref: ${{ github.event.pull_request.head.sha || github.sha }}
+        token: ${{ secrets.GITHUB_TOKEN }}
+        wait-interval-seconds: 15
   build-linux:
     permissions:
       contents: write       # for actions/upload-release-asset to upload release asset
@@ -40,13 +51,6 @@ jobs:
           path: ${{github.workspace}}/build/_deps
           key: ${{ matrix.os }}-build-deps
           restore-keys: ${{ matrix.os }}-build-deps
-
-      - name: Cache build/lib
-        uses: actions/cache@v3
-        with:
-          path: ${{github.workspace}}/build/lib
-          key: ${{ matrix.os }}-build-lib
-          restore-keys: ${{ matrix.os }}-build-lib
 
       - name: Setup Environment
         run: | 
