@@ -59,13 +59,15 @@ if (NOT googletest_FOUND) # If there's none, fetch and build googletest
     )
 endif()
 # Check if we are in Debug mode before making Google Test available
-find_package(googletest ${GOOGLETEST_VERSION} QUIET) # QUIET or REQUIRED
-FetchContent_GetProperties(googletest)
-if (NOT googletest_POPULATED) # Have we downloaded googletest yet?
-    set(FETCHCONTENT_QUIET NO)
-    FetchContent_MakeAvailable(googletest)
-    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-endif()   
+if (CMAKE_BUILD_TYPE MATCHES "Debug")
+    find_package(googletest ${GOOGLETEST_VERSION} QUIET) # QUIET or REQUIRED
+    FetchContent_GetProperties(googletest)
+    if (NOT googletest_POPULATED) # Have we downloaded googletest yet?
+        set(FETCHCONTENT_QUIET NO)
+        FetchContent_MakeAvailable(googletest)
+        set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+    endif()   
 
-add_subdirectory(tests)
-enable_testing() # Enable CTest only when tests are included
+    add_subdirectory(tests)
+    enable_testing() # Enable CTest only when tests are included
+endif()
