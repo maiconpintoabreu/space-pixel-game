@@ -73,6 +73,7 @@ public:
         {
             UnloadTexture(planet_texture);
         }
+        TraceLog(LOG_INFO, "Planet destroyed");
     }
     void Render() override
     {

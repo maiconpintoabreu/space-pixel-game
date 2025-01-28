@@ -64,7 +64,7 @@ public:
     {
         colliding_objects.clear();
 
-        TraceLog(LOG_INFO, TextFormat("PhysicsObject destroyed"));
+        TraceLog(LOG_INFO, "PhysicsObject destroyed");
     };
 
     inline virtual void Update(float delta_time)

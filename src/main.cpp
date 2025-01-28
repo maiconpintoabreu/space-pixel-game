@@ -4,6 +4,7 @@
 #include <string>
 #include <cstring>
 
+
 #if defined(PLATFORM_DESKTOP)
 #define GLSL_VERSION 330
 #else // PLATFORM_ANDROID, PLATFORM_WEB
@@ -57,6 +58,7 @@ bool is_game_fullscreen = false;
 
 int main()
 {
+#define TESTING_POINTERS = 1
     SetTraceLogCallback(CustomLog);
     SetTraceLogLevel(LOG_DEBUG);
     InitWindow(screenWidth, screenHeight, "Space Game");

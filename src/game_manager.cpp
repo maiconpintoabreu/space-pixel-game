@@ -116,7 +116,7 @@ void GameManager::Render()
 
             // Initialize player
             player = Player::Create();
-            player->position = Vector2({GetScreenWidth()/camera.zoom/2, GetScreenHeight()/camera.zoom/2});
+            // player->position = Vector2({-1000, -1000});
             input_manager->SetPlayer(player);
             camera.target = player->GetPosition();
             camera.offset = Vector2({GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f});

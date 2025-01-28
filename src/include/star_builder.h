@@ -125,13 +125,13 @@ private:
     {
         for (auto &star : farStars)
         {
-            star.position = {static_cast<float>(GetRandomValue(0, screen_width)), static_cast<float>(GetRandomValue(0, screen_height))};
+            star.position = {static_cast<float>(GetRandomValue(-screen_width/2, screen_width/2)), static_cast<float>(GetRandomValue(-screen_height/2, screen_height/2))};
             star.speed = GetRandomValue(1, 2) / 10.0f;
             star.color = {200, 200, 200, static_cast<unsigned char>(GetRandomValue(155, 255))};
         }
         for (auto &star : nearStars)
         {
-            star.position = {static_cast<float>(GetRandomValue(0, screen_width)), static_cast<float>(GetRandomValue(0, screen_height))};
+            star.position = {static_cast<float>(GetRandomValue(-screen_width/2, screen_width/2)), static_cast<float>(GetRandomValue(-screen_height/2, screen_height/2))};
             star.speed = GetRandomValue(2, 6) / 10.0f;
             star.color = {255, 255, 255, static_cast<unsigned char>(GetRandomValue(155, 255))};
         }

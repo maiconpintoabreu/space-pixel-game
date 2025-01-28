@@ -5,7 +5,7 @@
 Player::Player()
 {
     // Initialize player physics
-    position = {GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f};
+    // position = {GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f};
     // Generate a image for the spaceship
     Image spaceship_image = GenImageColor(16, 16, BLANK);
 
@@ -45,6 +45,7 @@ Player::Player()
     {
         spaceship = {0};
     }
+
 
     UnloadImage(spaceship_image);
     origin = {spaceship.width / 2.0f, (spaceship.height / 2.0f) + 2};
