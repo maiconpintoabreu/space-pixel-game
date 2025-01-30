@@ -156,9 +156,11 @@ void GameManager::Render()
 
         // Draw IsWindowFullscreen()
         DrawText(TextFormat("IsWindowFullscreen: %i", IsWindowFullscreen()), 10, 160, 5, WHITE);
+        // Draw IsWindowFullscreen()
+        DrawText(TextFormat("IsWindowMaximized: %i", IsWindowMaximized()), 10, 170, 5, WHITE);
 
         // Draw render size
-        DrawText(TextFormat("Render: %i, %i", GetRenderWidth(), GetRenderHeight()), 10, 170, 5, WHITE);
+        DrawText(TextFormat("Render: %i, %i", GetRenderWidth(), GetRenderHeight()), 10, 180, 5, WHITE);
     }
     // Draw FPS
     DrawFPS(GetScreenWidth() - 100, 10);

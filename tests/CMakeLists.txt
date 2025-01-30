@@ -26,8 +26,8 @@ if(CMAKE_BUILD_TYPE MATCHES "Debug")
     target_link_libraries(space-pixel-tests
         PRIVATE
             space-pixel-lib
-            gtest
-            gtest_main
+            GTest::gtest
+            GTest::gtest_main
             pthread
     )
 

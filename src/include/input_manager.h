@@ -112,8 +112,8 @@ public:
     }
     void FixUpdate()
     {
-        if (!is_initialized)
-            return;
+        if (!is_initialized) return;
+        if (!is_touch_enabled) return;
         if (IsButtonPressed(touch_left_area))
         {
             is_turning_left = true;

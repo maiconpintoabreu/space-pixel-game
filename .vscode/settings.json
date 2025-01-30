@@ -54,6 +54,13 @@
         "cinttypes": "cpp",
         "typeinfo": "cpp",
         "bit": "cpp",
-        "*.m": "cpp"
+        "*.m": "cpp",
+        "unordered_set": "cpp",
+        "any": "cpp",
+        "csignal": "cpp",
+        "forward_list": "cpp",
+        "list": "cpp",
+        "iomanip": "cpp",
+        "variant": "cpp"
     }
 }

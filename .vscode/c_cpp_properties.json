@@ -3,8 +3,9 @@
         {
             "name": "Linux",
             "includePath": [
-                "${workspaceFolder}/**",
-                "${workspaceFolder}/build/**",
+                "${workspaceFolder}/src/**",
+                "${workspaceFolder}/build/_deps/raylib-build/raylib/include",
+                "${workspaceFolder}/build/_deps/googletest-src/googletest/include",
                 "/usr/include",
                 "/usr/local/include"
             ],

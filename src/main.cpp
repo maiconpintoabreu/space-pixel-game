@@ -61,7 +61,7 @@ int main()
 #define TESTING_POINTERS = 1
     SetTraceLogCallback(CustomLog);
     SetTraceLogLevel(LOG_DEBUG);
-    InitWindow(screenWidth, screenHeight, "Space Game");
+    InitWindow(screenWidth, screenHeight, "Depths of Iara");
     
 // check if windows
 #if defined(_WIN32)
@@ -82,6 +82,7 @@ int main()
 #ifdef __EMSCRIPTEN__
     emscripten_set_main_loop(UpdateDrawFrame, 0, 1);
 #else
+    //SetTargetFPS(120);
     SetTargetFPS(GetMonitorRefreshRate(GetCurrentMonitor()));
     
     // Main game loop
