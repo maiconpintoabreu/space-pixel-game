@@ -49,6 +49,7 @@ void GameManager::Update(float delta_time)
         camera.offset = {GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f};
         // Zoom in if the screen increases and zoom out if the screen decreases
         camera.zoom = 1.0f * (GetScreenWidth() + GetScreenHeight()) / 1000;
+        if(camera.zoom < 1) camera.zoom = 1.0f;
         star_builder->camera_zoom = camera.zoom;
     }
     if(!player->IsAlive()){
@@ -116,11 +117,12 @@ void GameManager::Render()
 
             // Initialize player
             player = Player::Create();
-            // player->position = Vector2({-1000, -1000});
+            // player->position = Vector2({0, -10000});
             input_manager->SetPlayer(player);
             camera.target = player->GetPosition();
             camera.offset = Vector2({GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f});
             camera.zoom = 1.0f * (GetScreenWidth() + GetScreenHeight()) / 1000;
+            if(camera.zoom < 1) camera.zoom = 1.0f;
             camera.rotation = 0.0f;
             star_builder = new StarBuilder(100, camera.target, camera.zoom);
         }

@@ -73,6 +73,7 @@ int main()
         SetWindowSize(GetMonitorWidth(GetCurrentMonitor()),
                       GetMonitorHeight(GetCurrentMonitor()));
     }
+    SetWindowState(FLAG_WINDOW_RESIZABLE);
 
 
     // Create a GameManager instance
@@ -82,7 +83,7 @@ int main()
 #ifdef __EMSCRIPTEN__
     emscripten_set_main_loop(UpdateDrawFrame, 0, 1);
 #else
-    //SetTargetFPS(120);
+    //SetTargetFPS(0);
     SetTargetFPS(GetMonitorRefreshRate(GetCurrentMonitor()));
     
     // Main game loop

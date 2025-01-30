@@ -29,8 +29,8 @@ public:
 
     StarBuilder(int num_stars = 500, Vector2 camera_position = {0.0f, 0.0f}, float camera_zoom = 1.0f) : camera_position(camera_position), camera_zoom(camera_zoom)
     {
-        screen_width = GetScreenWidth() / camera_zoom;
-        screen_height = GetScreenHeight() / camera_zoom;
+        screen_width = 1280;
+        screen_height = 1280;
         if (num_stars > MAX_STARS)
         {
             num_stars = MAX_STARS;
@@ -49,14 +49,7 @@ public:
 
     void Update(float delta_time)
     {
-        if (IsWindowResized())
-        {
-            screen_width = GetScreenWidth() / camera_zoom;
-            screen_height = GetScreenHeight() / camera_zoom;
-            TraceLog(LOG_INFO, TextFormat("Screen size: %i x %i", screen_width, screen_height));
-
-            TraceLog(LOG_INFO, TextFormat("Real Screen size: %i x %i", GetScreenWidth(), GetScreenHeight()));
-        }
+        // do nothing here yet!!!
     }
 
     void FixUpdate(Vector2 in_camera_position)

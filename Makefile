@@ -6,7 +6,7 @@ all: configure build test
 
 # Check if the build directory exists, if not create it
 configure-windows:
-	@mkdir $(BUILD_DIR)> NUL
+	# @mkdir $(BUILD_DIR)> NUL
 	@cmake build . -S . -B $(BUILD_DIR) -DCMAKE_BUILD_TYPE=${BUILD_TYPE}
 
 configure:
