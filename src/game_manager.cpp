@@ -152,8 +152,8 @@ void GameManager::Render()
         // Draw monitor size
         DrawText(TextFormat("Monitor: %i, %i", GetMonitorWidth(0), GetMonitorHeight(0)), 10, 150, 5, WHITE);
 #else
-        // Draw monitor size
-        DrawText(TextFormat("Monitor: %i, %i", GetMonitorWidth(GetCurrentMonitor()), GetMonitorHeight(GetCurrentMonitor())), 10, 150, 5, WHITE);
+        // Draw monitor size (This can reduce a lot the FPS)
+        //DrawText(TextFormat("Monitor: %i, %i", GetMonitorWidth(GetCurrentMonitor()), GetMonitorHeight(GetCurrentMonitor())), 10, 150, 5, WHITE);
 #endif
 
         // Draw IsWindowFullscreen()
