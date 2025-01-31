@@ -56,49 +56,6 @@ float accumulator = 0.0f;
 GameManager *gameManager;
 bool is_game_fullscreen = false;
 
-int main()
-{
-#define TESTING_POINTERS = 1
-    SetTraceLogCallback(CustomLog);
-    SetTraceLogLevel(LOG_DEBUG);
-    InitWindow(screenWidth, screenHeight, "Depths of Iara");
-    
-// check if windows
-#if defined(_WIN32)
-    ToggleFullscreen();
-#endif
-
-    if (IsWindowFullscreen())
-    {
-        SetWindowSize(GetMonitorWidth(GetCurrentMonitor()),
-                      GetMonitorHeight(GetCurrentMonitor()));
-    }
-    SetWindowState(FLAG_WINDOW_RESIZABLE);
-
-
-    // Create a GameManager instance
-    gameManager = new GameManager();
-    SetMouseCursor(MOUSE_CURSOR_CROSSHAIR);
-
-#ifdef __EMSCRIPTEN__
-    emscripten_set_main_loop(UpdateDrawFrame, 0, 1);
-#else
-    //SetTargetFPS(0);
-    SetTargetFPS(GetMonitorRefreshRate(GetCurrentMonitor()));
-    
-    // Main game loop
-    while (!WindowShouldClose())
-    {
-        UpdateDrawFrame();
-    }
-#endif
-
-    delete gameManager;
-
-    CloseWindow();
-
-    return 0;
-}
 void UpdateDrawFrame(void)
 {
     if (!is_game_fullscreen && IsWindowFullscreen())
@@ -135,4 +92,46 @@ void UpdateDrawFrame(void)
 
     EndDrawing();
 
+}
+
+int main()
+{
+    SetTraceLogCallback(CustomLog);
+    SetTraceLogLevel(LOG_DEBUG);
+    InitWindow(screenWidth, screenHeight, "Depths of Iara");
+    
+// check if windows
+#if defined(_WIN32)
+    ToggleFullscreen();
+#endif
+
+    if (IsWindowFullscreen())
+    {
+        SetWindowSize(GetMonitorWidth(GetCurrentMonitor()),
+                      GetMonitorHeight(GetCurrentMonitor()));
+    }
+    SetWindowState(FLAG_WINDOW_RESIZABLE);
+
+
+    // Create a GameManager instance
+    gameManager = new GameManager();
+    SetMouseCursor(MOUSE_CURSOR_CROSSHAIR);
+
+#ifdef __EMSCRIPTEN__
+    emscripten_set_main_loop(UpdateDrawFrame, 0, 1);
+#else
+    //SetTargetFPS(0);
+    SetTargetFPS(GetMonitorRefreshRate(GetCurrentMonitor()));
+    
+    // Main game loop
+    while (!WindowShouldClose())
+    {
+        UpdateDrawFrame();
+    }
+#endif
+
+    delete gameManager;
+    CloseWindow();
+
+    return 0;
 }

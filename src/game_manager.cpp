@@ -25,6 +25,7 @@ GameManager::GameManager()
     // Zoom in if the screen increases and zoom out if the screen decreases
     camera.zoom = 1.0f * (GetScreenWidth() + GetScreenHeight()) / 1000;
     input_manager = new InputManager();
+    asteriod_cooldown_time = 0.2f;
     SpawnAsteroid(asteriod_cooldown_time);
     planet = Planet::Create({GetScreenWidth()/2.0f, GetScreenHeight()/2.0f});
 }
@@ -56,6 +57,16 @@ void GameManager::Update(float delta_time)
         // implement game overs screen and destroying physic world, player and star field generator.
         // implement reset game if player choose to try again.
         // the idea is for the player to comeback in the closest space station or beginning position if no space station discovered.
+        is_menu = true;
+        player.reset();
+        camera.target = { 0 };
+        camera.offset = { 0 };
+        PhysicsSystem::GetInstance().Unload();
+        if(star_builder != nullptr){
+            delete star_builder;
+            star_builder = nullptr;
+        }
+        return;
     }
     input_manager->Update(delta_time);
     frameCounter++;
@@ -74,9 +85,9 @@ void GameManager::FixUpdate(float delta_time)
     PhysicsSystem::GetInstance().FixUpdate(delta_time, camera_with_offset);
     if (player == nullptr)  return;
     input_manager->FixUpdate();
-    camera.target = player->GetPosition();
     star_builder->FixUpdate(camera.target);
     SpawnAsteroid(delta_time);
+    camera.target = player->GetPosition();
 }
 
 void GameManager::Render()
@@ -131,7 +142,7 @@ void GameManager::Render()
         {
             // Exit game
             isGameOver_ = true;
-            exit(0);
+            exit(EXIT_SUCCESS);
         }
     }
 
