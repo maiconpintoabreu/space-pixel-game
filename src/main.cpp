@@ -1,5 +1,6 @@
 #include "raylib.h"
 #include "game_manager.h"
+#include "global.h"
 #include <iostream>
 #include <string>
 #include <cstring>
@@ -17,9 +18,9 @@
 
 void UpdateDrawFrame(void);
 
-void CustomLog(int msgType, const char *text, va_list args)
+void CustomLog(int msg_type, const char *text, va_list args)
 {
-    switch (msgType)
+    switch (msg_type)
     {
     case LOG_INFO:
         // check if text starts with TIMER:
@@ -49,13 +50,18 @@ void CustomLog(int msgType, const char *text, va_list args)
     }
 }
 // Initialization
-const int screenWidth = 640;
-const int screenHeight = 360;
-const float targetFrameTime = 0.02f; // Target 50 FPS
-float accumulator = 0.0f;
-GameManager *gameManager;
-bool is_game_fullscreen = false;
+int screen_width = 640;
+int screen_height = 360;
+int virtual_screen_width = 640;
+int virtual_screen_height = 360;
+const float target_frame_time = 0.02f; // Target 50 FPS
 
+float scale = (float)screen_height / (float)virtual_screen_height;
+float accumulator = 0.0f;
+GameManager *game_manager;
+bool is_game_fullscreen = false;
+float dt = -1;
+RenderTexture2D target;
 void UpdateDrawFrame(void)
 {
     if (!is_game_fullscreen && IsWindowFullscreen())
@@ -63,43 +69,58 @@ void UpdateDrawFrame(void)
 #ifdef __EMSCRIPTEN__
         SetWindowSize(GetMonitorWidth(0),
                     GetMonitorHeight(0));
+        is_game_fullscreen = true;
 #else
         SetWindowSize(GetMonitorWidth(GetCurrentMonitor()),
                     GetMonitorHeight(GetCurrentMonitor()));
+        is_game_fullscreen = true;
 #endif
         is_game_fullscreen = true;
     }else if(is_game_fullscreen){
         is_game_fullscreen = false;
     }
+    if(IsWindowResized()){
+        screen_height = GetScreenHeight();
+        screen_width = GetScreenWidth();
+        scale = (float)screen_height / (float)virtual_screen_height;
+    }
     // Measure time elapsed since last frame
-    float dt = GetFrameTime();
+    dt = GetFrameTime();
     // Update game manager
     if(IsWindowFocused()){
-        gameManager->Update(dt);
+        game_manager->Update(dt);
         // Fix Update for physics
         accumulator += dt;
-        while (accumulator >= targetFrameTime)
+        while (accumulator >= target_frame_time)
         {
-            gameManager->FixUpdate(targetFrameTime);
-            accumulator -= targetFrameTime;
+            game_manager->FixUpdate(accumulator);
+            accumulator -= accumulator;
         }
+        TraceLog(LOG_DEBUG, TextFormat("Update Time: %f accumulator: %f", dt, accumulator));
     }
-    BeginDrawing();
+    BeginTextureMode(target);
     // All drawing happens here
     if(IsWindowFocused()){
-        gameManager->Render();
+        game_manager->Render();
     }
 
-    EndDrawing();
+    EndTextureMode();
 
+    BeginDrawing();
+        Rectangle source_rec = {0,0, (float)target.texture.width, (float)-target.texture.height};
+        Rectangle dest_rec = {0,0, (float)virtual_screen_width * scale, (float)virtual_screen_height * scale};
+
+        DrawTexturePro(target.texture, source_rec, dest_rec, { 0, 0 }, 0, WHITE);
+    EndDrawing();
 }
 
+#ifndef TESTING
 int main()
 {
     SetTraceLogCallback(CustomLog);
     SetTraceLogLevel(LOG_DEBUG);
-    InitWindow(screenWidth, screenHeight, "Depths of Iara");
-    
+    InitWindow(screen_width, screen_height, "Depths of Iara");
+    target = LoadRenderTexture(virtual_screen_width, virtual_screen_height);
 // check if windows
 #if defined(_WIN32)
     ToggleFullscreen();
@@ -107,14 +128,19 @@ int main()
 
     if (IsWindowFullscreen())
     {
+
+#ifdef __EMSCRIPTEN__
+        SetWindowSize(GetMonitorWidth(0),
+                    GetMonitorHeight(0));
+        is_game_fullscreen = true;
+#else
         SetWindowSize(GetMonitorWidth(GetCurrentMonitor()),
-                      GetMonitorHeight(GetCurrentMonitor()));
+                    GetMonitorHeight(GetCurrentMonitor()));
+        is_game_fullscreen = true;
+#endif
     }
-    SetWindowState(FLAG_WINDOW_RESIZABLE);
-
-
-    // Create a GameManager instance
-    gameManager = new GameManager();
+    // Create a Game_manager instance
+    game_manager = new GameManager();
     SetMouseCursor(MOUSE_CURSOR_CROSSHAIR);
 
 #ifdef __EMSCRIPTEN__
@@ -130,8 +156,9 @@ int main()
     }
 #endif
 
-    delete gameManager;
+    delete game_manager;
     CloseWindow();
 
     return 0;
 }
+#endif

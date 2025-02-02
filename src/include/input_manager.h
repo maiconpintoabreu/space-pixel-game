@@ -5,6 +5,7 @@
 #include "raymath.h"
 #include "player.h"
 #include <memory>
+#include "global.h"
 
 class InputManager
 {
@@ -68,11 +69,11 @@ public:
     }
     void LoadGUI()
     {
-        size = 100.0f * (GetScreenWidth() + GetScreenHeight()) / 1000;
-        touch_left_area = {10, static_cast<float>(GetScreenHeight()) - (size + 20), size, size};
-        touch_right_area = {(size + 20), static_cast<float>(GetScreenHeight()) - (size + 20), size, size};
-        touch_up_area = {static_cast<float>(GetScreenWidth()) - (size + 10), static_cast<float>(GetScreenHeight()) - (size + 20), size, size};
-        touch_shoot_area = {static_cast<float>(GetScreenWidth()) - (size * 2 + 20), static_cast<float>(GetScreenHeight()) - (size + 20), size, size};
+        size = 100.0f * (virtual_screen_width + virtual_screen_height) / 1000;
+        touch_left_area = {10, static_cast<float>(virtual_screen_height) - (size + 20), size, size};
+        touch_right_area = {(size + 20), static_cast<float>(virtual_screen_height) - (size + 20), size, size};
+        touch_up_area = {static_cast<float>(virtual_screen_width) - (size + 10), static_cast<float>(virtual_screen_height) - (size + 20), size, size};
+        touch_shoot_area = {static_cast<float>(virtual_screen_width) - (size * 2 + 20), static_cast<float>(virtual_screen_height) - (size + 20), size, size};
 
         turn_image = GenImageColor(size, size, BLANK);
         ImageDrawTextEx(&turn_image, GetFontDefault(), "<", {16 * size / 50.0f, 3 * size / 50.0f}, size, 0.0f, WHITE);

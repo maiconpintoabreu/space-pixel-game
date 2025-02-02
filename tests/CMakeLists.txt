@@ -4,7 +4,6 @@ file(GLOB SRC_HEADERS "${CMAKE_SOURCE_DIR}/src/include/*.h")
 
 # Create a static library from src files
 add_library(space-pixel-lib STATIC ${SRC_SOURCES} ${SRC_HEADERS})
-
 target_link_libraries(space-pixel-lib PUBLIC raylib)
 
 # Set include directories for the library
@@ -38,6 +37,8 @@ if(CMAKE_BUILD_TYPE MATCHES "Debug")
     # Perform test discovery using the created target
     gtest_discover_tests(space-pixel-tests)
 endif()
+
+target_compile_definitions(space-pixel-lib PRIVATE TESTING)
 
 # Installation (Optional)
 install(TARGETS space-pixel-lib DESTINATION lib)

@@ -7,6 +7,7 @@
 #include <memory>
 #include "physics_object.h"
 #include "enums.h"
+#include "global.h"
 
 class PhysicsSystem
 {
@@ -17,17 +18,14 @@ private:
     float m_gravity_y;
     // unique player for now
     std::shared_ptr<PhysicsObject> player;
-    // astronomical objects
-    std::vector<std::shared_ptr<PhysicsObject>> physic_astronomical_objects;
-    // bullets
-    std::vector<std::shared_ptr<PhysicsObject>> physic_bullet_objects;
+    std::vector<std::shared_ptr<PhysicsObject>> physic_objects;
     std::map<int, std::weak_ptr<PhysicsObject>> by_id_physic_objects;
 
 
     inline bool IsPositionOnScreen(Vector2 world_position, Vector2 camera_position)
     {
-        if (world_position.x >= camera_position.x && world_position.x <= camera_position.x + GetScreenWidth() &&
-            world_position.y >= camera_position.y && world_position.y <= camera_position.y + GetScreenHeight())
+        if (world_position.x >= camera_position.x && world_position.x <= camera_position.x + virtual_screen_width &&
+            world_position.y >= camera_position.y && world_position.y <= camera_position.y + virtual_screen_height)
         {
             return true; // Position is on screen
         }
@@ -48,10 +46,10 @@ public:
             player = shared_physic_object;
             break;
         case ObjectType::ASTEROID_TYPE:
-            physic_astronomical_objects.push_back(shared_physic_object);
+            physic_objects.push_back(shared_physic_object);
             break;
         case ObjectType::BULLET_TYPE:
-            physic_bullet_objects.push_back(shared_physic_object);
+            physic_objects.push_back(shared_physic_object);
             break;
         default:
             TraceLog(LOG_WARNING, "Unknown object type");
@@ -66,6 +64,10 @@ public:
         static PhysicsSystem instance(gravity_x, gravity_y);
         return instance;
     }
+    inline std::vector<std::shared_ptr<PhysicsObject>> GetPhysiscsObjectList()
+    {
+        return physic_objects;
+    }
 
     inline std::shared_ptr<PhysicsObject> GetPhysicsObject(int id)
     {
@@ -79,10 +81,6 @@ public:
     // Delete copy constructor and assignment operator
     PhysicsSystem(const PhysicsSystem &) = delete;
     PhysicsSystem &operator=(const PhysicsSystem &) = delete;
-
-    inline void Update(float delta_time)
-    {
-    }
 
     inline void FixUpdate(float delta_time, Vector2 camera_with_offset)
     {
@@ -101,7 +99,7 @@ public:
                 player->is_collision_enabled = false;
             }
         }
-        for (const auto &obj : physic_bullet_objects)
+        for (const auto &obj : physic_objects)
         {
             if (obj)
             {
@@ -117,50 +115,11 @@ public:
                 {
                     obj->is_collision_enabled = false;
                 }
-                CheckBulletCollisions(obj);
-            }
-        }
-        for (const auto &obj : physic_astronomical_objects)
-        {
-            if (obj)
-            {
-                obj->velocity.y += m_gravity_y * delta_time;
-                obj->velocity.x += m_gravity_x * delta_time;
-                obj->FixUpdate(delta_time);
-                obj->is_on_screen = IsPositionOnScreen(obj->position, camera_with_offset);
-                if (obj->is_on_screen)
-                {
-                    obj->is_collision_enabled = true;
+                if(obj->object_type == ObjectType::ASTEROID_TYPE){
+                    CheckAstronomicalObjectCollisions(obj);
+                }else if(obj->object_type == ObjectType::BULLET_TYPE){
+                    CheckBulletCollisions(obj);
                 }
-                else
-                {
-                    obj->is_collision_enabled = false;
-                }
-            }
-            CheckAstronomicalObjectCollisions(obj);
-        }
-    }
-    inline void Render()
-    {
-        for (const auto &obj : physic_astronomical_objects)
-        {
-            if (obj && obj->is_alive)
-            {
-                obj->Render();
-            }
-        }
-        for (const auto &obj : physic_bullet_objects)
-        {
-            if (obj && obj->is_alive)
-            {
-                obj->Render();
-            }
-        }
-        if (player)
-        {
-            if (player->is_alive)
-            {
-                player->Render();
             }
         }
     }
@@ -182,9 +141,9 @@ public:
                 break;
             case ObjectType::ASTEROID_TYPE:
                 // remove from colliding objects
-                for (size_t  i = 0; i < physic_astronomical_objects.size(); ++i)
+                for (size_t  i = 0; i < physic_objects.size(); ++i)
                 {
-                    if(auto shared_physics_object = physic_astronomical_objects[i]){
+                    if(auto shared_physics_object = physic_objects[i]){
                         if (shared_physics_object->id == object_id)
                         {
                             index_to_remove = i;
@@ -193,19 +152,19 @@ public:
                     }
                 }
                 if(index_to_remove < 0) return;
-                last_index = static_cast<int>(physic_astronomical_objects.size())-1;
+                last_index = static_cast<int>(physic_objects.size())-1;
                 if(index_to_remove > last_index) return;
-                physic_astronomical_objects[index_to_remove].reset();
+                physic_objects[index_to_remove].reset();
                 if(index_to_remove != 0){
-                    physic_astronomical_objects[index_to_remove] = physic_astronomical_objects[last_index];
+                    physic_objects[index_to_remove] = physic_objects[last_index];
                 }
-                physic_astronomical_objects.pop_back();
+                physic_objects.pop_back();
                 break;
             case ObjectType::BULLET_TYPE:
                 // remove from colliding objects
-                for (size_t  i = 0; i < physic_bullet_objects.size(); ++i)
+                for (size_t  i = 0; i < physic_objects.size(); ++i)
                 {
-                    if(auto shared_physics_object = physic_bullet_objects[i]){
+                    if(auto shared_physics_object = physic_objects[i]){
                         if (shared_physics_object->id == object_id)
                         {
                             index_to_remove = i;
@@ -215,13 +174,13 @@ public:
                 }
                 TraceLog(LOG_DEBUG, TextFormat("index removed: %i", index_to_remove));
                 if(index_to_remove < 0) return;
-                last_index = static_cast<int>(physic_bullet_objects.size())-1;
+                last_index = static_cast<int>(physic_objects.size())-1;
                 if(index_to_remove > last_index) return;
-                physic_bullet_objects[index_to_remove].reset();
+                physic_objects[index_to_remove].reset();
                 if(index_to_remove != 0){
-                    physic_bullet_objects[index_to_remove] = physic_bullet_objects[last_index];
+                    physic_objects[index_to_remove] = physic_objects[last_index];
                 }
-                physic_bullet_objects.pop_back();
+                physic_objects.pop_back();
                 TraceLog(LOG_DEBUG, TextFormat("index removed: %i", index_to_remove));
                 break;
             default:
@@ -291,16 +250,11 @@ public:
     }
     void Unload()
     {
-        for (size_t  i = 0; i < physic_astronomical_objects.size(); ++i)
+        for (size_t  i = 0; i < physic_objects.size(); ++i)
         {
-            physic_astronomical_objects[i].reset();
+            physic_objects[i].reset();
         }
-        physic_astronomical_objects.clear();
-        for (size_t  i = 0; i < physic_bullet_objects.size(); ++i)
-        {
-            physic_bullet_objects[i].reset();
-        }
-        physic_bullet_objects.clear();
+        physic_objects.clear();
         player.reset();
         by_id_physic_objects.clear();
     }
@@ -323,9 +277,9 @@ private:
     // }
     inline void CheckBulletCollisions(std::shared_ptr<PhysicsObject> bullet)
     {
-        for (const auto &obj : physic_astronomical_objects)
+        for (const auto &obj : physic_objects)
         {
-            if (obj && obj->is_alive)
+            if (obj && obj->is_alive && obj->object_type == ObjectType::ASTEROID_TYPE)
             {
                 bullet->CheckCollision(obj);
             }

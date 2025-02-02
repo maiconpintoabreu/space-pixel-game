@@ -1,6 +1,7 @@
 #include "game_manager.h"
 #include <string>
 #include "enums.h"
+#include "global.h"
 
 GameManager::GameManager()
 {
@@ -17,42 +18,41 @@ GameManager::GameManager()
     // Initialize menu stars
     for (int i = 0; i < 100; i++)
     {
-        menu_stars.push_back({static_cast<float>(GetRandomValue(0, GetScreenWidth())), static_cast<float>(GetRandomValue(0, GetScreenHeight()))});
+        menu_stars.push_back({static_cast<float>(GetRandomValue(0, virtual_screen_width)), static_cast<float>(GetRandomValue(0, virtual_screen_height))});
     }
     PhysicsSystem::GetInstance(0.0f, 0.0f); // Initialize physic world
     camera.offset = {0.0f, 0.0f};
     camera.target = {0.0f, 0.0f};
     // Zoom in if the screen increases and zoom out if the screen decreases
-    camera.zoom = 1.0f * (GetScreenWidth() + GetScreenHeight()) / 1000;
+    camera.zoom = 1.0f * (virtual_screen_width + virtual_screen_height) / 1000;
     input_manager = new InputManager();
     asteriod_cooldown_time = 0.2f;
     SpawnAsteroid(asteriod_cooldown_time);
-    planet = Planet::Create({GetScreenWidth()/2.0f, GetScreenHeight()/2.0f});
+    planet = Planet::Create({virtual_screen_width/2.0f, virtual_screen_height/2.0f});
 }
 
 void GameManager::Update(float delta_time)
 {
-    PhysicsSystem::GetInstance().Update(delta_time);
     if (player == nullptr)
     {
 
-        if (IsWindowResized())
-        { // Only update when window is resized
-            camera.offset = {0.0f, 0.0f};
-            camera.target = {0.0f, 0.0f};
-            // Zoom in if the screen increases and zoom out if the screen decreases
-            camera.zoom = 1.0f * (GetScreenWidth() + GetScreenHeight()) / 1000;
-        }
+        // if (IsWindowResized())
+        // { // Only update when window is resized
+        //     camera.offset = {0.0f, 0.0f};
+        //     camera.target = {0.0f, 0.0f};
+        //     // Zoom in if the screen increases and zoom out if the screen decreases
+        //     // camera.zoom = 1.0f * (virtual_screen_width + virtual_screen_height) / 1000;
+        // }
         return;
     }
-    if (IsWindowResized())
-    { // Only update when window is resized
-        camera.offset = {GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f};
-        // Zoom in if the screen increases and zoom out if the screen decreases
-        camera.zoom = 1.0f * (GetScreenWidth() + GetScreenHeight()) / 1000;
-        if(camera.zoom < 1) camera.zoom = 1.0f;
-        star_builder->camera_zoom = camera.zoom;
-    }
+    // if (IsWindowResized())
+    // { // Only update when window is resized
+    //     // camera.offset = {virtual_screen_width / 2.0f, virtual_screen_height / 2.0f};
+    //     // Zoom in if the screen increases and zoom out if the screen decreases
+    //     // camera.zoom = 1.0f * (virtual_screen_width + virtual_screen_height) / 1000;
+    //     // if(camera.zoom < 1) camera.zoom = 1.0f;
+    //     // star_builder->camera_zoom = camera.zoom;
+    // }
     if(!player->IsAlive()){
         // implement game overs screen and destroying physic world, player and star field generator.
         // implement reset game if player choose to try again.
@@ -79,15 +79,37 @@ void GameManager::Update(float delta_time)
     // Vector2 camera_with_offset = Vector2Subtract(camera.target, camera.offset);
 }
 
+void GameManager::RelocateOriginBasedOnPlayerPosition(){
+    // MAX 1280 -+
+    std::vector<std::shared_ptr<PhysicsObject>> physic_objects = PhysicsSystem::GetInstance().GetPhysiscsObjectList();
+    if(player->position.x < -1280 || player->position.x > 1280){
+        // Move all objects based on payer position
+        for (const auto &obj : physic_objects){
+            obj->position.x -= player->position.x;
+        }
+        star_builder->ReOriginStarsX(player->position.x);
+        player->position.x = 0.0f;
+    }
+    if(player->position.y < -1280 || player->position.y > 1280){
+        // Move all objects based on payer position
+        for (const auto &obj : physic_objects){
+            obj->position.y -= player->position.y;
+        }
+        star_builder->ReOriginStarsY(player->position.y);
+        player->position.y = 0.0f;
+    }
+}
+
 void GameManager::FixUpdate(float delta_time)
 {
-    Vector2 camera_with_offset = Vector2Subtract(camera.target, camera.offset);
-    PhysicsSystem::GetInstance().FixUpdate(delta_time, camera_with_offset);
     if (player == nullptr)  return;
     input_manager->FixUpdate();
+    Vector2 camera_with_offset = Vector2Subtract(camera.target, camera.offset);
+    PhysicsSystem::GetInstance().FixUpdate(delta_time, camera_with_offset);
+    camera.target = player->GetPosition();
     star_builder->FixUpdate(camera.target);
     SpawnAsteroid(delta_time);
-    camera.target = player->GetPosition();
+    RelocateOriginBasedOnPlayerPosition();
 }
 
 void GameManager::Render()
@@ -101,9 +123,12 @@ void GameManager::Render()
     {
         BeginMode2D(camera);
             star_builder->Render();
-            planet->Render();
             player->Render();
-            PhysicsSystem::GetInstance().Render();
+            for(const auto& obj : PhysicsSystem::GetInstance().GetPhysiscsObjectList()){
+                if(obj && obj->is_alive && obj->is_on_screen){
+                    obj->Render();
+                }
+            }
         EndMode2D();
         input_manager->Render();
     }
@@ -122,7 +147,7 @@ void GameManager::Render()
         float size_width = 200.0f;
         float size_height = 50.0f;
         // Add start menu
-        if (MenuButtom({static_cast<float>(GetScreenWidth() / 2) - size_width / 2, static_cast<float>(GetScreenHeight() / 2) - size_height / 1.5f, size_width, size_height}, "Start Game"))
+        if (MenuButtom({static_cast<float>(virtual_screen_width / 2) - size_width / 2, static_cast<float>(virtual_screen_height / 2) - size_height / 1.5f, size_width, size_height}, "Start Game"))
         {
             is_menu = false;
 
@@ -131,14 +156,14 @@ void GameManager::Render()
             // player->position = Vector2({0, -10000});
             input_manager->SetPlayer(player);
             camera.target = player->GetPosition();
-            camera.offset = Vector2({GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f});
-            camera.zoom = 1.0f * (GetScreenWidth() + GetScreenHeight()) / 1000;
-            if(camera.zoom < 1) camera.zoom = 1.0f;
-            camera.rotation = 0.0f;
+            camera.offset = Vector2({virtual_screen_width / 2.0f, virtual_screen_height / 2.0f});
+            // camera.zoom = 1.0f * (virtual_screen_width + virtual_screen_height) / 1000;
+            // if(camera.zoom < 1) camera.zoom = 1.0f;
+            // camera.rotation = 0.0f;
             star_builder = new StarBuilder(100, camera.target, camera.zoom);
         }
         // Add exit button
-        if (MenuButtom({static_cast<float>(GetScreenWidth() / 2) - size_width / 2, static_cast<float>(GetScreenHeight() / 2) + size_height / 1.5f, size_width, size_height}, "Exit Game"))
+        if (MenuButtom({static_cast<float>(virtual_screen_width / 2) - size_width / 2, static_cast<float>(virtual_screen_height / 2) + size_height / 1.5f, size_width, size_height}, "Exit Game"))
         {
             // Exit game
             isGameOver_ = true;
@@ -154,7 +179,7 @@ void GameManager::Render()
         // Draw Planet position
         if (planet) DrawText(TextFormat("Planet: %f, %f", planet->GetPosition().x, planet->GetPosition().y), 10, 110, 5, WHITE);
         // Draw screen size
-        DrawText(TextFormat("Screen: %i, %i", GetScreenWidth(), GetScreenHeight()), 10, 130, 5, WHITE);
+        DrawText(TextFormat("Screen: %i, %i", virtual_screen_width, virtual_screen_height), 10, 130, 5, WHITE);
 
         // Draw camera zoom
         DrawText(TextFormat("Camera Zoom: %f", camera.zoom), 10, 140, 5, WHITE);
@@ -176,7 +201,7 @@ void GameManager::Render()
         DrawText(TextFormat("Render: %i, %i", GetRenderWidth(), GetRenderHeight()), 10, 180, 5, WHITE);
     }
     // Draw FPS
-    DrawFPS(GetScreenWidth() - 100, 10);
+    DrawFPS(virtual_screen_width - 100, 10);
 }
 
 void GameManager::SpawnAsteroid(float delta_time)
@@ -185,10 +210,10 @@ void GameManager::SpawnAsteroid(float delta_time)
     if (asteriod_cooldown > asteriod_cooldown_time)
     {
         // Get camera view boundaries
-        float cameraLeftEdge = camera.target.x - (GetScreenWidth() / (2.0f * camera.zoom));
-        float cameraRightEdge = camera.target.x + (GetScreenWidth() / (2.0f * camera.zoom));
-        float cameraTopEdge = camera.target.y - (GetScreenHeight() / (2.0f * camera.zoom));
-        float cameraBottomEdge = camera.target.y + (GetScreenHeight() / (2.0f * camera.zoom));
+        float cameraLeftEdge = camera.target.x - (virtual_screen_width / (2.0f * camera.zoom));
+        float cameraRightEdge = camera.target.x + (virtual_screen_width / (2.0f * camera.zoom));
+        float cameraTopEdge = camera.target.y - (virtual_screen_height / (2.0f * camera.zoom));
+        float cameraBottomEdge = camera.target.y + (virtual_screen_height / (2.0f * camera.zoom));
 
         // Randomly choose which edge to spawn from (0: top, 1: right, 2: bottom, 3: left)
         int spawnEdge = GetRandomValue(0, 3);

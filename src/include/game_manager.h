@@ -57,6 +57,7 @@ public:
 private:
     bool isGameOver_;
     int score;
+    void RelocateOriginBasedOnPlayerPosition();
     bool LoadMap();
     // draw buttoms for a menu using Rectangle
     int MenuButtom(Rectangle buttom, const char *buttom_text);

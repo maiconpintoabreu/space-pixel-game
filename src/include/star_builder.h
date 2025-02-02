@@ -58,10 +58,12 @@ public:
         for (Star &star : farStars)
         {
             star.position.x -= star.speed * GetFrameTime();
+            ResetStar(star, camera_position);
         }
         for (Star &star : nearStars)
         {
             star.position.x -= star.speed * GetFrameTime();
+            ResetStar(star, camera_position);
         }
     }
 
@@ -93,6 +95,24 @@ public:
             star.position.x = GetRandomValue(left_edge, right_edge);
         }
     }
+    void ReOriginStarsX(float x)
+    {
+        for (Star &obj : farStars){
+            obj.position.x -= x;
+        }
+        for (Star &obj : nearStars){
+            obj.position.x -= x;
+        }
+    }
+    void ReOriginStarsY(float y)
+    {
+        for (Star &obj : farStars){
+            obj.position.y -= y;
+        }
+        for (Star &obj : nearStars){
+            obj.position.y -= y;
+        }
+    }
 
     void ReInitializeStars()
     {
@@ -104,12 +124,10 @@ public:
         for (Star &star : farStars)
         {
             DrawPixelV(star.position, star.color);
-            ResetStar(star, camera_position);
         }
         for (Star &star : nearStars)
         {
             DrawPixelV(star.position, star.color);
-            ResetStar(star, camera_position);
         }
     }
 
