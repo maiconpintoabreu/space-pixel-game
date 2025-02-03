@@ -18,6 +18,7 @@ public:
 
     static std::shared_ptr<Planet> Create(Vector2 in_position){
         std::shared_ptr<Planet> obj = std::make_shared<Planet>(in_position);
+        obj->object_type = ObjectType::ASTEROID_TYPE;
         obj->physics_id = PhysicsObject::CreatePhysicsId(obj);
         TraceLog(LOG_INFO, "Object of type Planet created");
         return obj;

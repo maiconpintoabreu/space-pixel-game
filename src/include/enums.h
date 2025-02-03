@@ -11,5 +11,13 @@ enum class ObjectType
     UNKNOWN_TYPE
 };
 
+enum class ObjectShape
+{
+    Circle,
+    Rectangle,
+    Triangle,
+    Lines
+};
+
 #endif // ENUMS_H
 

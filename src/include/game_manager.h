@@ -27,8 +27,8 @@ private:
     std::shared_ptr<Player> player;
     StarBuilder *star_builder = nullptr;
     InputManager *input_manager = nullptr;
-    std::shared_ptr<AstronomicalObject> asteroid;
     std::shared_ptr<Planet> planet;
+    std::vector<std::shared_ptr<PhysicsObject>> physic_objects;
 
     float asteriod_cooldown = 0.0f;
     float asteriod_cooldown_time = 1.0f;
@@ -44,11 +44,11 @@ public:
         {
             delete star_builder;
         }
-        asteroid.reset();
         if (input_manager != nullptr)
         {
             delete input_manager;
         }
+        physic_objects.clear();
         player.reset();
         PhysicsSystem::GetInstance().Unload();
         TraceLog(LOG_INFO, "GameManager destroyed");

@@ -120,6 +120,7 @@ int main()
     SetTraceLogCallback(CustomLog);
     SetTraceLogLevel(LOG_DEBUG);
     InitWindow(screen_width, screen_height, "Depths of Iara");
+    SetWindowState(FLAG_WINDOW_RESIZABLE);
     target = LoadRenderTexture(virtual_screen_width, virtual_screen_height);
 // check if windows
 #if defined(_WIN32)

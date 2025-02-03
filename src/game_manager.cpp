@@ -76,15 +76,13 @@ void GameManager::Update(float delta_time)
         score = player->GetScore();
     }
     star_builder->Update(delta_time);
-    // Vector2 camera_with_offset = Vector2Subtract(camera.target, camera.offset);
 }
 
 void GameManager::RelocateOriginBasedOnPlayerPosition(){
     // MAX 1280 -+
-    std::vector<std::shared_ptr<PhysicsObject>> physic_objects = PhysicsSystem::GetInstance().GetPhysiscsObjectList();
     if(player->position.x < -1280 || player->position.x > 1280){
         // Move all objects based on payer position
-        for (const auto &obj : physic_objects){
+        for (std::shared_ptr<PhysicsObject> &obj : physic_objects){
             obj->position.x -= player->position.x;
         }
         star_builder->ReOriginStarsX(player->position.x);
@@ -92,7 +90,7 @@ void GameManager::RelocateOriginBasedOnPlayerPosition(){
     }
     if(player->position.y < -1280 || player->position.y > 1280){
         // Move all objects based on payer position
-        for (const auto &obj : physic_objects){
+        for (std::shared_ptr<PhysicsObject> &obj : physic_objects){
             obj->position.y -= player->position.y;
         }
         star_builder->ReOriginStarsY(player->position.y);
@@ -123,10 +121,17 @@ void GameManager::Render()
     {
         BeginMode2D(camera);
             star_builder->Render();
-            player->Render();
-            for(const auto& obj : PhysicsSystem::GetInstance().GetPhysiscsObjectList()){
-                if(obj && obj->is_alive && obj->is_on_screen){
-                    obj->Render();
+            for(const auto& obj : physic_objects){
+                if(obj){
+                    PhysicsBody& body = PhysicsSystem::GetInstance().GetPhysicsObject(obj->physics_id);
+                    if(body.is_alive && body.is_on_screen){
+                        obj->position = body.position;
+                        obj->rotation = body.rotation;
+                        obj->is_accelerating = body.is_accelerating;
+                        obj->is_rotating_left = body.is_rotating_left;
+                        obj->is_rotating_right = body.is_rotating_right;
+                        obj->Render();
+                    }
                 }
             }
         EndMode2D();
@@ -154,6 +159,7 @@ void GameManager::Render()
             // Initialize player
             player = Player::Create();
             // player->position = Vector2({0, -10000});
+            physic_objects.push_back(player);
             input_manager->SetPlayer(player);
             camera.target = player->GetPosition();
             camera.offset = Vector2({virtual_screen_width / 2.0f, virtual_screen_height / 2.0f});
@@ -238,14 +244,21 @@ void GameManager::SpawnAsteroid(float delta_time)
             spawnPos.y = GetRandomValue(cameraTopEdge - 50, cameraBottomEdge + 50);
             break;
         }
+        // Testing
+        if(GetRandomValue(0,1) == 1){
+            spawnPos = player->position;
+            spawnPos.x += 50;
+        }
         // calculate direction to camera center
         Vector2 direction = Vector2Normalize(Vector2Subtract(camera.target, spawnPos));
 
         asteriod_cooldown = 0.0f;
-        asteroid = AstronomicalObject::Create(ObjectType::ASTEROID_TYPE, 100.0f, 10.0f, 1, spawnPos, {.2f, .2f}, 50.0f, 100.0f);
+        std::shared_ptr<AstronomicalObject> asteroid = AstronomicalObject::Create(ObjectType::ASTEROID_TYPE, 100.0f, 10.0f, 1, spawnPos, {.2f, .2f}, 50.0f, 100.0f);
+        
         PhysicsSystem::GetInstance().ApplyForce(asteroid->physics_id, 10, direction);
         // random torque
         PhysicsSystem::GetInstance().ApplyTorque(asteroid->physics_id, GetRandomValue(-100, 100));
+        physic_objects.push_back(asteroid);
     }
 }
 

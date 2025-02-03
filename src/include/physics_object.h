@@ -8,13 +8,6 @@
 #include <memory>
 #include "enums.h"
 
-enum class ObjectShape
-{
-    Circle,
-    Rectangle,
-    Triangle,
-    Lines
-};
 class PhysicsObject : public std::enable_shared_from_this<PhysicsObject> 
 {
 private:
@@ -73,68 +66,6 @@ public:
     }
     inline virtual void FixUpdate(float delta_time)
     {
-        if (is_static)
-            return;
-        // ensure our angle is between -180 and +180
-        if (rotation > 180.0f)
-            rotation -= 360.0f;
-
-        if (rotation < -180.0f)
-            rotation += 360.0f;
-
-        // Limit speed
-        if (Vector2Length(velocity) > speed_limit)
-        {
-            velocity = Vector2Normalize(velocity);
-            velocity = Vector2Scale(velocity, speed_limit);
-        }
-
-        // Update position if velocity is different then 0
-        if (Vector2Length(velocity) > 0.0f)
-        {
-            // Friction
-            velocity = Vector2Scale(velocity, 1 - deceleration_multiplier * delta_time);
-            position = Vector2Add(position, Vector2Scale(velocity, delta_time));
-        }else{
-            is_accelerating = false;
-        }
-        // adjust rotation_torque to rotation_speed_limit
-        if (rotation_torque > rotation_speed_limit)
-        {
-            rotation_torque = rotation_speed_limit;
-        }
-        else if (rotation_torque < -rotation_speed_limit)
-        {
-            rotation_torque = -rotation_speed_limit;
-        }
-        // Update rotation if rotational_velocity is different then 0
-        if (rotation_torque != 0.0f)
-        {
-            rotation += rotation_torque * delta_time;
-            // Update rotational velocity
-            if (!is_applying_torque)
-            {
-                rotation_torque = rotation_torque * (1 - deceleration_multiplier * delta_time);
-            }
-            is_applying_torque = false;
-        }
-        // check if still colliding
-        for (int i = colliding_objects.size() - 1; i >= 0; i--)
-        {
-            if (auto shared_object = colliding_objects[i].lock())
-            {
-                if (!IsColliding(shared_object))
-                {
-                    ExitCollision(shared_object);
-                }
-            }
-            else
-            {
-                colliding_objects.erase(colliding_objects.begin() + i);
-                if (colliding_objects.size() == 0)
-                    is_colliding = false;
-            }
-        }
     }
 
     inline virtual bool CheckCollision(std::shared_ptr<PhysicsObject> other)

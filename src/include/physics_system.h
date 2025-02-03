@@ -2,12 +2,35 @@
 #define PHYSICS_SYSTEM_H
 
 #include <vector>
-#include <algorithm> // for std::remove
 #include <map>
 #include <memory>
 #include "physics_object.h"
 #include "enums.h"
 #include "global.h"
+
+struct PhysicsBody
+{
+    Vector2 position{};
+    Vector2 center{};
+    float rotation = 0;
+    float rotation_torque = 0;
+    float speed_limit = 0;
+    float deceleration_multiplier = 0;
+    float rotation_speed_limit = 0;
+    Vector2 velocity{};
+    ObjectShape collision = ObjectShape::Circle;
+    ObjectType type = ObjectType::UNKNOWN_TYPE;
+    float width = 0.0f;
+    float height = 0.0f;
+    bool is_alive = false;
+    bool is_on_screen = false;
+    bool is_collision_enabled = false;
+    bool is_accelerating = false;
+    bool is_applying_torque = false;
+    bool is_rotating_left = false;
+    bool is_rotating_right = false;
+    std::weak_ptr<PhysicsObject> game_object;
+};
 
 class PhysicsSystem
 {
@@ -17,10 +40,8 @@ private:
     float m_gravity_x;
     float m_gravity_y;
     // unique player for now
-    std::shared_ptr<PhysicsObject> player;
-    std::vector<std::shared_ptr<PhysicsObject>> physic_objects;
-    std::map<int, std::weak_ptr<PhysicsObject>> by_id_physic_objects;
-
+    int player_id;
+    std::vector<PhysicsBody> physics_body_list;
 
     inline bool IsPositionOnScreen(Vector2 world_position, Vector2 camera_position)
     {
@@ -35,28 +56,23 @@ private:
         }
     }
 public:
-    inline int CreatePhysicsObject(std::shared_ptr<PhysicsObject> shared_physic_object)
+    inline int CreatePhysicsObject(PhysicsBody body)
     {
-        int index = ++current_object_id;
-        shared_physic_object->id = index;
-        by_id_physic_objects[index] = shared_physic_object;
-        switch (shared_physic_object->object_type)
-        {
-        case ObjectType::PLAYER_TYPE:
-            player = shared_physic_object;
-            break;
-        case ObjectType::ASTEROID_TYPE:
-            physic_objects.push_back(shared_physic_object);
-            break;
-        case ObjectType::BULLET_TYPE:
-            physic_objects.push_back(shared_physic_object);
-            break;
-        default:
-            TraceLog(LOG_WARNING, "Unknown object type");
-            break;
+        int index_saved = static_cast<int>(physics_body_list.size());
+        for (int i=0;i<index_saved;i++){
+            if(!physics_body_list[i].is_alive){
+                physics_body_list[i] = body;
+                if(body.type == ObjectType::PLAYER_TYPE){
+                    player_id = i;
+                }
+                return i;
+            }
         }
-        TraceLog(LOG_INFO, TextFormat("PhysicsObject %i created with id: %i", shared_physic_object->object_type, index));
-        return index;
+        physics_body_list.push_back(body);
+        if(body.type == ObjectType::PLAYER_TYPE){
+            player_id = index_saved;
+        }
+        return index_saved;
     }
 
     static PhysicsSystem &GetInstance(float gravity_x = 0.0f, float gravity_y = 0.0f)
@@ -64,18 +80,10 @@ public:
         static PhysicsSystem instance(gravity_x, gravity_y);
         return instance;
     }
-    inline std::vector<std::shared_ptr<PhysicsObject>> GetPhysiscsObjectList()
-    {
-        return physic_objects;
-    }
 
-    inline std::shared_ptr<PhysicsObject> GetPhysicsObject(int id)
+    inline PhysicsBody& GetPhysicsObject(int id)
     {
-        if (auto shared_physic_object = by_id_physic_objects.at(id).lock())
-        {
-            return shared_physic_object;
-        }
-        return nullptr;
+        return physics_body_list[id];
     }
 
     // Delete copy constructor and assignment operator
@@ -84,111 +92,102 @@ public:
 
     inline void FixUpdate(float delta_time, Vector2 camera_with_offset)
     {
-        if (player)
+        for (PhysicsBody& body : physics_body_list)
         {
-            player->velocity.y += m_gravity_y * delta_time;
-            player->velocity.x += m_gravity_x * delta_time;
-            player->FixUpdate(delta_time);
-            player->is_on_screen = IsPositionOnScreen(player->position, camera_with_offset);
-            if (player->is_on_screen)
+            if (body.is_alive)
             {
-                player->is_collision_enabled = true;
-            }
-            else
-            {
-                player->is_collision_enabled = false;
-            }
-        }
-        for (const auto &obj : physic_objects)
-        {
-            if (obj)
-            {
-                obj->velocity.y += m_gravity_y * delta_time;
-                obj->velocity.x += m_gravity_x * delta_time;
-                obj->FixUpdate(delta_time);
-                obj->is_on_screen = IsPositionOnScreen(obj->position, camera_with_offset);
-                if (obj->is_on_screen)
+                Move(delta_time, body);
+                body.velocity.y += m_gravity_y * delta_time;
+                body.velocity.x += m_gravity_x * delta_time;
+                body.is_on_screen = IsPositionOnScreen(body.position, camera_with_offset);
+                if (body.is_on_screen)
                 {
-                    obj->is_collision_enabled = true;
+                    body.is_collision_enabled = true;
+                    if(body.type == ObjectType::ASTEROID_TYPE){
+                        CheckAstronomicalObjectCollisions(body);
+                    }else if(body.type == ObjectType::BULLET_TYPE){
+                        CheckBulletCollisions(body);
+                    }
                 }
                 else
                 {
-                    obj->is_collision_enabled = false;
-                }
-                if(obj->object_type == ObjectType::ASTEROID_TYPE){
-                    CheckAstronomicalObjectCollisions(obj);
-                }else if(obj->object_type == ObjectType::BULLET_TYPE){
-                    CheckBulletCollisions(obj);
+                    body.is_collision_enabled = false;
                 }
             }
         }
+    }
+    inline void Move(float delta_time, PhysicsBody& body){
+        
+        // ensure our angle is between -180 and +180
+        if (body.rotation > 180.0f)
+            body.rotation -= 360.0f;
+
+        if (body.rotation < -180.0f)
+            body.rotation += 360.0f;
+
+        // Limit speed
+        if (Vector2Length(body.velocity) > body.speed_limit)
+        {
+            body.velocity = Vector2Normalize(body.velocity);
+            body.velocity = Vector2Scale(body.velocity, body.speed_limit);
+        }
+
+        // Update position if velocity is different then 0
+        if (Vector2Length(body.velocity) > 0.0f)
+        {
+            // Friction
+            body.velocity = Vector2Scale(body.velocity, 1 - body.deceleration_multiplier * delta_time);
+            body.position = Vector2Add(body.position, Vector2Scale(body.velocity, delta_time));
+        }else{
+            body.is_accelerating = false;
+        }
+        // adjust rotation_torque to rotation_speed_limit
+        if (body.rotation_torque > body.rotation_speed_limit)
+        {
+            body.rotation_torque = body.rotation_speed_limit;
+        }
+        else if (body.rotation_torque < -body.rotation_speed_limit)
+        {
+            body.rotation_torque = -body.rotation_speed_limit;
+        }
+        // Update rotation if rotational_velocity is different then 0
+        if (body.rotation_torque != 0.0f)
+        {
+            body.rotation += body.rotation_torque * delta_time;
+            // Update rotational velocity
+            if (!body.is_applying_torque)
+            {
+                body.rotation_torque = body.rotation_torque * (1 - body.deceleration_multiplier * delta_time);
+            }
+            body.is_applying_torque = false;
+        }
+        // // check if still colliding
+        // for (int i = body.colliding_objects.size() - 1; i >= 0; i--)
+        // {
+        //     if (auto shared_object = body.colliding_objects[i].lock())
+        //     {
+        //         if (!body.IsColliding(shared_object))
+        //         {
+        //             body.ExitCollision(shared_object);
+        //         }
+        //     }
+        //     else
+        //     {
+        //         body.colliding_objects.erase(body.colliding_objects.begin() + i);
+        //         if (colliding_objects.size() == 0)
+        //             body.is_colliding = false;
+        //     }
+        // }
     }
     inline void RemoveObject(int object_id)
     {
         if (object_id < 0)
             return;
-        auto it = by_id_physic_objects.find(object_id);
-        if (it == by_id_physic_objects.end())
+        PhysicsBody& body = physics_body_list[object_id];
+        if (!body.is_alive)
             return;
-        int index_to_remove = -1;
-        int last_index = -1;
-        if (auto shared_physic_object = it->second.lock())
-        {
-            switch (shared_physic_object->object_type)
-            {
-            case ObjectType::PLAYER_TYPE:
-                player.reset();
-                break;
-            case ObjectType::ASTEROID_TYPE:
-                // remove from colliding objects
-                for (size_t  i = 0; i < physic_objects.size(); ++i)
-                {
-                    if(auto shared_physics_object = physic_objects[i]){
-                        if (shared_physics_object->id == object_id)
-                        {
-                            index_to_remove = i;
-                            break;
-                        }
-                    }
-                }
-                if(index_to_remove < 0) return;
-                last_index = static_cast<int>(physic_objects.size())-1;
-                if(index_to_remove > last_index) return;
-                physic_objects[index_to_remove].reset();
-                if(index_to_remove != 0){
-                    physic_objects[index_to_remove] = physic_objects[last_index];
-                }
-                physic_objects.pop_back();
-                break;
-            case ObjectType::BULLET_TYPE:
-                // remove from colliding objects
-                for (size_t  i = 0; i < physic_objects.size(); ++i)
-                {
-                    if(auto shared_physics_object = physic_objects[i]){
-                        if (shared_physics_object->id == object_id)
-                        {
-                            index_to_remove = i;
-                            break;
-                        }
-                    }
-                }
-                TraceLog(LOG_DEBUG, TextFormat("index removed: %i", index_to_remove));
-                if(index_to_remove < 0) return;
-                last_index = static_cast<int>(physic_objects.size())-1;
-                if(index_to_remove > last_index) return;
-                physic_objects[index_to_remove].reset();
-                if(index_to_remove != 0){
-                    physic_objects[index_to_remove] = physic_objects[last_index];
-                }
-                physic_objects.pop_back();
-                TraceLog(LOG_DEBUG, TextFormat("index removed: %i", index_to_remove));
-                break;
-            default:
-                TraceLog(LOG_WARNING, "Unknown object type");
-                break;
-            }
-            by_id_physic_objects.erase(object_id);
-        }
+        body.is_alive = false;
+        body.game_object.reset();
     }
 
     inline void SetGravity(float x, float y)
@@ -201,46 +200,35 @@ public:
     {
         if (object_id < 0)
             return;
-        if (by_id_physic_objects.count(object_id) == 0)
+        PhysicsBody& body = physics_body_list[object_id];
+        if (!body.is_alive)
             return;
-        const auto &obj = by_id_physic_objects.at(object_id);
-        // move forward based on rotation angle
-        // TODO: make it to accenerate by time/force using lerp
-        if (auto shared_physic_object = obj.lock())
-        {
-            Vector2 direction = {sinf(shared_physic_object->rotation * DEG2RAD), -cosf(shared_physic_object->rotation * DEG2RAD)};
-            shared_physic_object->velocity = Vector2Scale(direction, force);
-            shared_physic_object->is_accelerating = true;
-        }
+        Vector2 direction = {sinf(body.rotation * DEG2RAD), -cosf(body.rotation * DEG2RAD)};
+        body.velocity = Vector2Scale(direction, force);
+        body.is_accelerating = true;
     }
     inline void ApplyForce(int object_id, float force, Vector2 direction)
     {
         if (object_id < 0)
             return;
-        auto it = by_id_physic_objects.find(object_id);
-        if (it == by_id_physic_objects.end())
+        PhysicsBody& body = physics_body_list[object_id];
+        if (!body.is_alive)
             return;
-        if (auto shared_physic_object = it->second.lock())
-        {
-            // move forward based on rotation angle
-            shared_physic_object->velocity = Vector2Scale(direction, force);
-            shared_physic_object->is_accelerating = true;
-        }
+        // move forward based on rotation angle
+        body.velocity = Vector2Scale(direction, force);
+        body.is_accelerating = true;
     }
     inline void ApplyTorque(int object_id, float torque)
     {
         if (object_id < 0)
             return;
-        auto it = by_id_physic_objects.find(object_id);
-        if (it == by_id_physic_objects.end())
+        PhysicsBody& body = physics_body_list[object_id];
+        if (!body.is_alive)
             return;
-        if (auto shared_physic_object = it->second.lock())
-        {
-            shared_physic_object->rotation_torque += torque;
-            shared_physic_object->is_applying_torque = true;
-            shared_physic_object->is_rotating_left = torque < 0;
-            shared_physic_object->is_rotating_right = torque > 0;
-        }
+        body.rotation_torque += torque;
+        body.is_applying_torque = true;
+        body.is_rotating_left = torque < 0;
+        body.is_rotating_right = torque > 0;
     }
 
     // Destructor
@@ -250,60 +238,69 @@ public:
     }
     void Unload()
     {
-        for (size_t  i = 0; i < physic_objects.size(); ++i)
-        {
-            physic_objects[i].reset();
-        }
-        physic_objects.clear();
-        player.reset();
-        by_id_physic_objects.clear();
+        physics_body_list.clear();
     }
 
 private:
     // Private constructor
-    inline PhysicsSystem(float gravity_x = 0.0f, float gravity_y = 0.0f)
+    PhysicsSystem(float gravity_x = 0.0f, float gravity_y = 0.0f)
         : m_gravity_x(gravity_x), m_gravity_y(gravity_y) {}
 
-    // inline void CheckCollisions() {
-    //     for (int i = 0; i < physic_objects.size(); ++i) {
-    //         if(physic_objects[i]->is_collision_enabled){
-    //             for (int j = i + 1; j < physic_objects.size(); ++j) {
-    //                 if (physic_objects[i] && physic_objects[j] && physic_objects[j]->is_collision_enabled) {
-    //                     physic_objects[i]->CheckCollision(physic_objects[j]);
-    //                 }
-    //             }
-    //         }
-    //     }
-    // }
-    inline void CheckBulletCollisions(std::shared_ptr<PhysicsObject> bullet)
+    inline void CheckBulletCollisions(PhysicsBody& bullet)
     {
-        for (const auto &obj : physic_objects)
+        for (PhysicsBody& body : physics_body_list)
         {
-            if (obj && obj->is_alive && obj->object_type == ObjectType::ASTEROID_TYPE)
+            if (body.is_alive && body.type == ObjectType::ASTEROID_TYPE)
             {
-                bullet->CheckCollision(obj);
+                CheckCollision(bullet, body);
             }
         }
     }
-    inline void CheckAstronomicalObjectCollisions(std::shared_ptr<PhysicsObject> astronomical_object)
+    inline void CheckAstronomicalObjectCollisions(PhysicsBody& astronomical_object)
     {
-        if (astronomical_object && astronomical_object->is_alive)
+        if (astronomical_object.is_alive)
         {
-            // for (const auto& other : physic_astronomical_objects) {
-            //     if (other && other->is_alive) {
-            //         astronomical_object->CheckCollision(other);
-            //     }
-            // }
-            // for (const auto& other : physic_bullet_objects) {
-            //     if (other && other->is_alive) {
-            //         astronomical_object->CheckCollision(other);
-            //     }
-            // }
-            if (player && player->is_alive)
+            if (physics_body_list[player_id].is_alive)
             {
-                astronomical_object->CheckCollision(player);
+                CheckCollision(astronomical_object, physics_body_list[player_id]);
             }
         }
+    }
+      inline virtual bool CheckCollision(PhysicsBody& source, PhysicsBody& dest)
+    {
+        if (!source.is_alive || dest.is_alive)
+            return false;
+        bool is_colliding = false;
+        Vector2 temp_position = source.position + source.center;
+        Vector2 other_position = dest.position + dest.center;
+        if (source.collision == ObjectShape::Circle)
+        {
+            if (dest.collision == ObjectShape::Circle)
+            {
+                is_colliding = CheckCollisionCircles(temp_position, source.width / 2, other_position, dest.width / 2);
+            }
+            else if (dest.collision == ObjectShape::Rectangle)
+            {
+                is_colliding = CheckCollisionCircleRec(temp_position, source.width / 2, Rectangle({dest.position.x, dest.position.y, dest.width, dest.height}));
+            }
+        }
+        if (source.collision == ObjectShape::Rectangle)
+        {
+            if (dest.collision == ObjectShape::Circle)
+            {
+                is_colliding = CheckCollisionCircleRec(temp_position, source.width / 2, Rectangle({dest.position.x, dest.position.y, dest.width, dest.height}));
+            }
+            else if (dest.collision == ObjectShape::Rectangle)
+            {
+                is_colliding = CheckCollisionRecs(Rectangle({source.position.x, source.position.y, source.width, source.height}), Rectangle({dest.position.x, dest.position.y, dest.width, (float)dest.height}));
+            }
+        }
+        if (is_colliding){
+            if(auto shared_game_object = source.game_object.lock()){
+                shared_game_object->EnterCollision(dest.game_object.lock());
+            }
+        }
+        return is_colliding;
     }
 };
 
