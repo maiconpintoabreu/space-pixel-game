@@ -35,8 +35,6 @@ struct PhysicsBody
 class PhysicsSystem
 {
 private:
-    int current_object_id = -1;
-
     float m_gravity_x;
     float m_gravity_y;
     // unique player for now
